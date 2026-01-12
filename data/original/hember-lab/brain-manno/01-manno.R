@@ -1,6 +1,3 @@
-library(data.table)
-library(SingleCellExperiment)
-library(this.path)
 setwd(dirname(this.path::this.path()))
 source("../create_sce.R")
 ##### Human brain Manno et al. data preprocessing
@@ -12,7 +9,7 @@ fix_name <- function(name){
 }
 fix_type <- function(x) {as.numeric(as.character(x))}
 
-x1 = read.delim("GSE76381_ESMoleculeCounts.cef.txt", sep="\t", header=F)
+x1 = read.delim("GSE76381_ESMoleculeCounts.txt", sep="\t", header=F)
 cellid = x1[2,]
 celltype1=x1[3,]
 timepoint1=x1[4,]
@@ -23,7 +20,7 @@ colnames(x1) <- as.character(unlist(cellid))[-c(1,2)]
 tmp_rownames <- rownames(x1);
 x1 <- apply(x1, 2, fix_type)
 rownames(x1) <- tmp_rownames
-x2 = read.delim("GSE76381_EmbryoMoleculeCounts.cef.txt", sep="\t", header=F)
+x2 = read.delim("GSE76381_EmbryoMoleculeCounts.txt", sep="\t", header=F)
 cellid = x2[2,]
 celltype2=x2[3,]
 timepoint2=x2[4,]
@@ -34,7 +31,7 @@ colnames(x2) <- as.character(unlist(cellid))[-c(1,2)]
 tmp_rownames <- rownames(x2);
 x2 <- apply(x2, 2, fix_type)
 rownames(x2) <- tmp_rownames
-x3 = read.delim("GSE76381_iPSMoleculeCounts.cef.txt", sep="\t", header=F)
+x3 = read.delim("GSE76381_iPSMoleculeCounts.txt", sep="\t", header=F)
 cellid = x3[2,]
 celltype3=x3[3,]
 timepoint3=x3[4,]

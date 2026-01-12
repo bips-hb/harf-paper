@@ -1,6 +1,3 @@
-library(data.table)
-library(SingleCellExperiment)
-library(this.path)
 setwd(dirname(this.path::this.path()))
 source("../create_sce.R")
 ### DATA

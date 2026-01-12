@@ -1,10 +1,7 @@
-library(data.table)
-library(SingleCellExperiment)
-library(this.path)
 setwd(dirname(this.path::this.path()))
 # Preprocess Baron et al. human pancreas data
 
-cell_data <- fread("manno_not_filtered.txt")
+cell_data <- fread("patel_not_filtered.txt")
 cell_annotation <- data.table(cell_type = cell_data$cell_type)
 cell_data$cell_type <- NULL
 # Remove constant genes
@@ -37,5 +34,5 @@ sce <- sce[keep_genes, ]
 # Save sce as data.table
 sce_dt <- as.data.table(t(assay(sce)))
 sce_dt[, cell_type := sce$cell_type]
-fwrite(sce_dt, file = "processed_brain_manno_data.csv")
+fwrite(sce_dt, file = "processed_tissue_patel_data.csv")
 

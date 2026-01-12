@@ -47,3 +47,14 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+*.DS_Store
+
+# Ignore everything in original/hember-lab
+original/hember-lab/*
+
+# Except R scripts and sh file
+!original/hember-lab/*.R
+!original/hember-lab/*.sh
+
+

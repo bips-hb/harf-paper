@@ -1,6 +1,3 @@
-library(data.table)
-library(SingleCellExperiment)
-library(this.path)
 setwd(dirname(this.path::this.path()))
 source("../create_sce.R")
 ### DATA
@@ -36,9 +33,9 @@ rm(h1, h2, h3, h4)
 # human
 h_ann <- data.frame(
     human = c(
-        rep(1, length(labels_h1)), 
-        rep(2, length(labels_h2)), 
-        rep(3, length(labels_h3)), 
+        rep(1, length(labels_h1)),
+        rep(2, length(labels_h2)),
+        rep(3, length(labels_h3)),
         rep(4, length(labels_h4))
     ),
     cell_type1 = c(labels_h1, labels_h2, labels_h3, labels_h4))
