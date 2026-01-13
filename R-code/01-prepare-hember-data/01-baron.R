@@ -1,5 +1,4 @@
-setwd(dirname(this.path::this.path()))
-source("../create_sce.R")
+setwd(org_baron_dt_dir)
 ### DATA
 # human1
 h1 <- read.csv("GSM2230757_human1_umifm_counts.csv", header = T)
@@ -50,3 +49,5 @@ sceset_dt$cell_type <- h_sceset$cell_type1
 
 fwrite(x = sceset_dt,
        file = "baron_not_filtered.txt", sep = "\t")
+
+setwd(dirname(this.dir()))

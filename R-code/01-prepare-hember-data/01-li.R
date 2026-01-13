@@ -1,5 +1,4 @@
-setwd(dirname(this.path::this.path()))
-source("../create_sce.R")
+setwd(org_li_dt_dir)
 ### DATA
 d <- read.csv("data.csv")
 
@@ -19,3 +18,4 @@ sceset_dt <- as.data.table(t(logcounts(sceset)))
 sceset_dt$cell_type <- sceset$cell_type1
 fwrite(x = sceset_dt,
        file = "li_not_filtered.txt", sep = "\t")
+setwd(dirname(this.dir()))

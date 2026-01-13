@@ -1,5 +1,4 @@
-setwd(dirname(this.path::this.path()))
-source("../create_sce.R")
+setwd(org_manno_dt_dir)
 ##### Human brain Manno et al. data preprocessing
 
 ### DATA
@@ -74,3 +73,4 @@ sceset_dt$cell_type <- sceset$cell_type1
 
 fwrite(x = sceset_dt,
        file = "manno_not_filtered.txt", sep = "\t")
+setwd(dirname(this.dir()))

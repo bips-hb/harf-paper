@@ -1,4 +1,3 @@
 library(this.path)
-source(this.dir("01-libraries.R"))
-source(this.dir("01-setup.R"))
-source(this.dir("01-download-hember-data.R"))
+source(file.path(this.dir(), "00-library-and-setup.R"))
+source(file.path(this.dir(), "01-download-hember-data.R"))

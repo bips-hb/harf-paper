@@ -1,4 +1,4 @@
-setwd(dirname(this.path::this.path()))
+setwd(org_manno_dt_dir)
 # Preprocess Baron et al. human pancreas data
 
 cell_data <- fread("manno_not_filtered.txt")
@@ -35,4 +35,4 @@ sce <- sce[keep_genes, ]
 sce_dt <- as.data.table(t(assay(sce)))
 sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, file = "processed_brain_manno_data.csv")
-
+setwd(dirname(this.dir()))

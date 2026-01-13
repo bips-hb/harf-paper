@@ -1,7 +1,8 @@
-setwd(dirname(this.path::this.path()))
+setwd(org_baron_dt_dir)
+
 # Preprocess Baron et al. human pancreas data
 
-cell_data <- fread("li_not_filtered.txt")
+cell_data <- fread("baron_not_filtered.txt")
 cell_annotation <- data.table(cell_type = cell_data$cell_type)
 cell_data$cell_type <- NULL
 # Remove constant genes
@@ -9,7 +10,7 @@ cell_data <- cell_data[apply(cell_data, 1, function(x) var(as.numeric(x), na.rm 
 # lop1 transformation
 cell_data <- as.data.frame(cell_data)
 # Create singleCellExperiment object
-sce <- SingleCellExperiment(assays = list(counts = t(cell_data)))
+sce <- SingleCellExperiment(assays = list(counts = t(cell_data[, -1])))
 sce$cell_type <- cell_annotation$cell_type
 # Frequency filtering (FRQ): filter cells genes expressed in less than 6% of the cells
 freq_threshold <- 0.06
@@ -34,5 +35,16 @@ sce <- sce[keep_genes, ]
 # Save sce as data.table
 sce_dt <- as.data.table(t(assay(sce)))
 sce_dt[, cell_type := sce$cell_type]
-fwrite(sce_dt, file = "processed_tissue_li_data.csv")
+fwrite(sce_dt, file = "processed_brain_baron_data.csv")
 
+# logcounts(sce) <- (counts(sce))
+# set.seed(42)
+# pc_sce <- rpca(t(counts(sce)))
+# ts_sce <- Rtsne(pc_sce$x %*% t(pc_sce$rotation), perplexity = 30,
+#                 verb = FALSE, check_duplicates = FALSE)
+# reducedDim(sce, "tsne") = ts_sce$Y
+# sce_original_plot <- plotReducedDim(sce, "tsne", colour_by = "cell_type") +
+#   ggtitle("Original Data") +
+#   theme(legend.position = "none")
+# print(sce_original_plot)
+setwd(dirname(this.dir()))

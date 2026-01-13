@@ -1,5 +1,4 @@
-setwd(dirname(this.path::this.path()))
-source("../create_sce.R")
+setwd(org_lake_dt_dir)
 # Preprocess Lake et al. human brain data
 ### DATA
 # http://genome-tech.ucsd.edu/ZhangLab/index.php/data/epigenomics-and-transcriptomics/sns/
@@ -63,3 +62,5 @@ sceset_dt$cell_type <- sceset$cell_type1
 
 fwrite(x = sceset_dt,
        file = "lake_not_filtered.txt", sep = "\t")
+
+setwd(dirname(this.dir()))
