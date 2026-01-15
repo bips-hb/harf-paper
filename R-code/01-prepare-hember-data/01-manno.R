@@ -70,7 +70,8 @@ sceset <- create_sce_from_counts(DATA, ANN)
 # Built a data.table
 sceset_dt <- as.data.table(t(counts(sceset)))
 sceset_dt$cell_type <- sceset$cell_type1
-
+colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
+colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "manno_not_filtered.txt", sep = "\t")
 setwd(dirname(this.dir()))

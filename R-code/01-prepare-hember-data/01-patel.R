@@ -20,6 +20,8 @@ sceset <- create_sce_from_logcounts(d, ann)
 # Built a data.table
 sceset_dt <- as.data.table(t(logcounts(sceset)))
 sceset_dt$cell_type <- sceset$cell_type1
+colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
+colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "patel_not_filtered.txt", sep = "\t")
 setwd(dirname(this.dir()))

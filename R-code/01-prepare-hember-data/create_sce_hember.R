@@ -1,12 +1,9 @@
-library(SingleCellExperiment)
-library(scater)
-
 create_sce_from_counts <- function(counts, colData, rowData = NULL) {
   if(is.null(rowData)) {
-    sceset <- SingleCellExperiment(assays = list(counts = as.matrix(counts)), 
+    sceset <- SingleCellExperiment(assays = list(counts = as.matrix(counts)),
                                    colData = colData)
   } else {
-    sceset <- SingleCellExperiment(assays = list(counts = as.matrix(counts)), 
+    sceset <- SingleCellExperiment(assays = list(counts = as.matrix(counts)),
                                    colData = colData,
                                    rowData = rowData)
   }
@@ -23,16 +20,16 @@ create_sce_from_counts <- function(counts, colData, rowData = NULL) {
   if (sum(grepl("^ERCC-", rownames(sceset)))) {
     altExp(sceset, "ERCC") <- grepl("^ERCC-", rownames(sceset))
     sceset <- calculateQCMetrics(sceset, feature_controls = list("ERCC" = altExp(sceset, "ERCC")))
-  } 
+  }
   return(sceset)
 }
 
 create_sce_from_normcounts <- function(normcounts, colData, rowData = NULL) {
   if(is.null(rowData)) {
-    sceset <- SingleCellExperiment(assays = list(normcounts = as.matrix(normcounts)), 
+    sceset <- SingleCellExperiment(assays = list(normcounts = as.matrix(normcounts)),
                                    colData = colData)
   } else {
-    sceset <- SingleCellExperiment(assays = list(normcounts = as.matrix(normcounts)), 
+    sceset <- SingleCellExperiment(assays = list(normcounts = as.matrix(normcounts)),
                                    colData = colData,
                                    rowData = rowData)
   }
@@ -47,16 +44,16 @@ create_sce_from_normcounts <- function(normcounts, colData, rowData = NULL) {
   if (sum(grepl("^ERCC-", rownames(sceset)))) {
     altExp(sceset, "ERCC") <- grepl("^ERCC-", rownames(sceset))
     sceset <- calculateQCMetrics(sceset, feature_controls = list("ERCC" = altExp(sceset, "ERCC")))
-  } 
+  }
   return(sceset)
 }
 
 create_sce_from_logcounts <- function(logcounts, colData, rowData = NULL) {
   if(is.null(rowData)) {
-    sceset <- SingleCellExperiment(assays = list(logcounts = as.matrix(logcounts)), 
+    sceset <- SingleCellExperiment(assays = list(logcounts = as.matrix(logcounts)),
                                    colData = colData)
   } else {
-    sceset <- SingleCellExperiment(assays = list(logcounts = as.matrix(logcounts)), 
+    sceset <- SingleCellExperiment(assays = list(logcounts = as.matrix(logcounts)),
                                    colData = colData,
                                    rowData = rowData)
   }
@@ -70,6 +67,6 @@ create_sce_from_logcounts <- function(logcounts, colData, rowData = NULL) {
   if (sum(grepl("^ERCC-", rownames(sceset)))) {
     altExp(sceset, "ERCC") <- grepl("^ERCC-", rownames(sceset))
     sceset <- calculateQCMetrics(sceset, feature_controls = list("ERCC" = altExp(sceset, "ERCC")))
-  } 
+  }
   return(sceset)
 }

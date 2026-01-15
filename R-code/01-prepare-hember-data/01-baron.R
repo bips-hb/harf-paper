@@ -46,7 +46,8 @@ h_sceset <- create_sce_from_counts(h, h_ann)
 # Built a data.table
 sceset_dt <- as.data.table(t(counts(h_sceset)))
 sceset_dt$cell_type <- h_sceset$cell_type1
-
+colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
+colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "baron_not_filtered.txt", sep = "\t")
 

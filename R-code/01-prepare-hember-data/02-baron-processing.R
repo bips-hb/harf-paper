@@ -34,8 +34,13 @@ sce <- sce[keep_genes, ]
 
 # Save sce as data.table
 sce_dt <- as.data.table(t(assay(sce)))
+min_cells <- floor(0.06 * nrow(sce_dt))
+keep_cols <- colSums(sce_dt > 0) > min_cells
+sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, file = "processed_brain_baron_data.csv")
+
+
 
 # logcounts(sce) <- (counts(sce))
 # set.seed(42)
