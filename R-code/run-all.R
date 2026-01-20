@@ -1,3 +1,8 @@
 library(this.path)
 source(file.path(this.dir(), "00-library-and-setup.R"))
 source(file.path(this.dir(), "02-preproceed-hember-data.R"))
+source(file.path(this.dir(), "03-synth-hember-data.R"))
+source(file.path(this.dir(), "04-preproceed-simlr-data.R"))
+source(file.path(this.dir(), "05-synth-simlr-data.R"))
+source(file.path(this.dir(), "07-preproceed-tcga-tgex-data.R"))
+source(file.path(this.dir(), "08-synth-curratedTCGA.R"))
