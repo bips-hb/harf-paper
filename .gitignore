@@ -53,8 +53,9 @@ rsconnect/
 # Ignore everything in original/hember-lab
 original/hember-lab/*
 
-# Except R scripts and sh file
-!original/hember-lab/*.R
+# Except sh scripts
 !original/hember-lab/*.sh
 
+# Ignore everything in synthesized/
+synthesized/*
 
