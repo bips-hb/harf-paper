@@ -27,7 +27,7 @@ suppressPackageStartupMessages({
   library(binom)
 })
 
-source("utils.R")
+source("R-code/perf_measure/utils.R")
 
 # ==============================================================================
 # Distributional similarity
