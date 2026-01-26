@@ -106,7 +106,7 @@ MMD <- function(syn, real_train, real_test = NULL, seed = NULL, ...) {
   real_train <- as.data.table(copy(real_train))
   if (!is.null(real_test)) real_test <- as.data.table(copy(real_test))
   
-  data_processed <- encode_mixed_dt(syn, real_train, real_test, scale_OH = 0.5,  output = "matrix")
+  data_processed <- encode_mixed_dt(syn, real_train, real_test, scale_OH = sqrt(0.5),  output = "matrix")
   sigma <- sigest(data_processed$real_train, fr = 1, scaled = F)[[2]]
   MMD_TrainSyn <- kmmd(data_processed$real_train, data_processed$syn, kernel = laplacedot(sigma))@mmdstats[1]
   res <- data.table(metric = "MMD", pair = "Train-Syn", result = MMD_TrainSyn)
