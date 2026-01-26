@@ -97,9 +97,36 @@ WD <- function(syn, real_train, real_test = NULL,
   res[, pair := factor(pair, levels = c("Train-Syn", "Test-Syn", "Train-Test"))][]
 }
 
+### --- Maximum mean discrepancy (MMD) mit rbf kernel---------------------------
+MMD <- function(syn, real_train, real_test = NULL, seed = NULL, ...) {
+  if(!is.null(seed)) set.seed(seed)
+  
+  # convert to data.table (maybe vectors are given in univariate case)
+  syn <- as.data.table(copy(syn))
+  real_train <- as.data.table(copy(real_train))
+  if (!is.null(real_test)) real_test <- as.data.table(copy(real_test))
+  
+  data_processed <- encode_mixed_dt(syn, real_train, real_test, scale_OH = 0.5,  output = "matrix")
+  sigma <- sigest(data_processed$real_train, fr = 1, scaled = F)[[2]]
+  MMD_TrainSyn <- kmmd(data_processed$real_train, data_processed$syn, kernel = laplacedot(sigma))@mmdstats[1]
+  res <- data.table(metric = "MMD", pair = "Train-Syn", result = MMD_TrainSyn)
+  if (!is.null(real_test)) {
+    MMD_TestSyn <- kmmd(data_processed$real_test, data_processed$syn, kernel = rbfdot(sigma))@mmdstats[1]
+    MMD_TrainTest <- kmmd(data_processed$real_train, data_processed$real_test, kernel = rbfdot(sigma))@mmdstats[1]
+    res <- data.table(metric = "MMD", pair = c("Train-Syn", "Test-Syn", "Train-Test"), result = c(MMD_TrainSyn, MMD_TestSyn, MMD_TrainTest))
+  }
+  res[, pair := factor(pair, levels = c("Train-Syn", "Test-Syn", "Train-Test"))]
+  if (ncol(syn) > 1) {
+    res[]
+  } else {
+    res[, `:=` (metric = "Univariate distance", metric_info = "MMD")][, .(metric, metric_info, pair, result)]
+  }
+}
+
+
 ### --- Maximum mean discrepancy (MMD) with RF kernel --------------------------
 # (needs ranger branch "completely random forests")
-MMD <- function(syn, real_train, rf_train_data = "combined", normalized_kernel = FALSE, unbiased = FALSE,
+MMD_RF <- function(syn, real_train, rf_train_data = "combined", normalized_kernel = FALSE, unbiased = FALSE,
                 rf_min.bucket = 2, rf_num.trees = 50,  rf_replace = FALSE, rf_sample.fraction = 1, seed = NULL, ...) {
   
   
