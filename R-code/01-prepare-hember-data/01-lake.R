@@ -1,4 +1,4 @@
-#setwd(org_lake_dt_dir)
+setwd(org_lake_dt_dir)
 # Preprocess Lake et al. human brain data
 ### DATA
 # http://genome-tech.ucsd.edu/ZhangLab/index.php/data/epigenomics-and-transcriptomics/sns/
@@ -13,7 +13,7 @@
 # Problems: duplicate row names
 # Human
 # Download Lake-2016_Gene_TPM.dat and Lake-2016_Gene_TPM_Sample-annotation.txt from http://genome-tech.ucsd.edu/ZhangLab/index.php/data/epigenomics-and-transcriptomics/sns/
-system(sprintf("bash ./lake.sh", org_lake_dt_dir))
+system("bash ./lake.sh")
 x1 = read.delim("Lake-2016_Gene_TPM.dat", "\t", header=F, stringsAsFactors=FALSE)
 ann <- read.table("Lake-2016_Gene_TPM_Sample-annotation.txt", header=T)
 gene_names <- x1[,1]
@@ -66,4 +66,4 @@ colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "lake_not_filtered.txt", sep = "\t")
 
-#setwd(dirname(this.dir()))
+setwd(dirname(this.dir()))

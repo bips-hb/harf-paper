@@ -1,4 +1,4 @@
-setwd(org_deng_dt_dir)
+# setwd(org_deng_dt_dir)
 ### DATA
 deng_rpkms <- read.table("deng-rpkms.txt", check.names = F, header = T)
 genes <- deng_rpkms[ , 1]
@@ -24,4 +24,4 @@ colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
 colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = deng_dt,
        file = "embryo_deng_mouse_data.txt", sep = "\t")
-setwd(dirname(this.dir()))
+# setwd(dirname(this.dir()))

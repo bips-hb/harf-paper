@@ -1,4 +1,4 @@
-setwd(org_deng_dt_dir)
+# setwd(org_deng_dt_dir)
 # Preprocess Baron et al. human pancreas data
 
 cell_data <- fread("embryo_deng_mouse_data.txt")
@@ -34,4 +34,4 @@ keep_cols <- colSums(sce_dt > 0) > min_cells
 sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, "embryo_deng_mouse_processed_data.csv")
-setwd(dirname(this.dir()))
+# setwd(dirname(this.dir()))

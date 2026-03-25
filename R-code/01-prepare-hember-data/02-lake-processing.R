@@ -1,4 +1,4 @@
-setwd(org_lake_dt_dir)
+# setwd(org_lake_dt_dir)
 # Preprocess Baron et al. human pancreas data
 
 cell_data <- fread("lake_not_filtered.txt")
@@ -38,4 +38,4 @@ fwrite(sce_dt, "brain_lake_processed_data.csv")
 unlink("lake_not_filtered.txt")
 unlink("Lake-2016_Gene_TPM.dat")
 unlink("Lake-2016_Gene_TPM_Sample-annotation.txt")
-setwd(dirname(this.dir()))
+# setwd(dirname(this.dir()))

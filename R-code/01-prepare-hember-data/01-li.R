@@ -1,4 +1,4 @@
-setwd(org_li_dt_dir)
+# setwd(org_li_dt_dir)
 ### DATA
 d <- read.csv("data.csv")
 
@@ -20,4 +20,4 @@ colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
 colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "li_not_filtered.txt", sep = "\t")
-setwd(dirname(this.dir()))
+# setwd(dirname(this.dir()))

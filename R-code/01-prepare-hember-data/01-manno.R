@@ -1,4 +1,4 @@
-setwd(org_manno_dt_dir)
+# setwd(org_manno_dt_dir)
 ##### Human brain Manno et al. data preprocessing
 
 ### DATA
@@ -74,4 +74,4 @@ colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
 colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "manno_not_filtered.txt", sep = "\t")
-setwd(dirname(this.dir()))
+# setwd(dirname(this.dir()))

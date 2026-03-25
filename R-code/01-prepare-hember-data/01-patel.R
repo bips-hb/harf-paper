@@ -1,4 +1,4 @@
-setwd(org_patel_dt_dir)
+# setwd(org_patel_dt_dir)
 ### DATA
 d <- read.table("data.txt")
 # select 5 patients
@@ -24,4 +24,4 @@ colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
 colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "patel_not_filtered.txt", sep = "\t")
-setwd(dirname(this.dir()))
+# setwd(dirname(this.dir()))
