@@ -33,7 +33,7 @@ sce_dt <- as.data.table(t(assay(sce)))
 # keep_cols <- colSums(sce_dt > 0) > min_cells
 # sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
-fwrite(sce_dt, "brain_lake_processed_data.csv")
+fwrite(sce_dt, org_lake_dt_file)
 # Remove intermediate files
 unlink("lake_not_filtered.txt")
 unlink("Lake-2016_Gene_TPM.dat")
