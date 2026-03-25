@@ -81,6 +81,10 @@ org_hember_dt_files <- c(
   patel = org_patel_dt_file,
   deng = org_deng_dt_file
 )
+# Create directories for processed data
+for (folder in dirname(org_hember_dt_files)) {
+  dir.create(folder, recursive = TRUE, showWarnings = FALSE)
+}
 
 # Raw SIMLR data file
 org_simlr_mecs_file <- file.path(org_simlr_data_dir, "Test_1_mECS.RData")
@@ -97,6 +101,7 @@ org_simlr_dt_files <- c(
 )
 
 # Processed SIMLR file
+dir.create(org_simlr_data_dir, recursive = TRUE, showWarnings = FALSE)
 org_simlr_mecs_proc_file <- file.path(org_simlr_data_dir, "mecs_data.csv")
 org_simlr_kolog_proc_file <- file.path(org_simlr_data_dir, "kolod_data.csv")
 org_simlr_pollen_proc_file <- file.path(org_simlr_data_dir, "pollen_data.csv")
