@@ -36,7 +36,7 @@ sce_dt <- as.data.table(t(assay(sce)))
 # keep_cols <- colSums(sce_dt > 0) > min_cells
 # sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
-fwrite(sce_dt, file = "processed_brain_manno_data.csv")
+fwrite(sce_dt, file = org_manno_dt_file)
 # Remove intermediate files
 unlink("manno_not_filtered.txt")
 unlink("GSE76381_EmbryoMoleculeCounts.cef.txt")

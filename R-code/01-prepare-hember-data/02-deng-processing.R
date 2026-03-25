@@ -33,7 +33,7 @@ min_cells <- floor(0.06 * nrow(sce_dt))
 keep_cols <- colSums(sce_dt > 0) > min_cells
 sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
-fwrite(sce_dt, "embryo_deng_mouse_processed_data.csv")
+fwrite(sce_dt, org_deng_dt_file)
 # remove intermediate files
 unlink("deng-rpkms.txt")
 unlink("embryo_deng_mouse_data.txt")
