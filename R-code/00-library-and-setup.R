@@ -13,7 +13,7 @@ if (FALSE) {
   if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
   BiocManager::install("SingleCellExperiment")
-  BiocManager::install("scater")
+ # BiocManager::install("scater")
   BiocManager::install(c("curatedTCGAData", "SummarizedExperiment"))
   install.packages("ggplot2")
   install.packages("corrplot")
@@ -44,7 +44,8 @@ registerDoParallel(cores = 2)
 
 # Setups
 # =================================
-r_code_dir <- dirname(this.path())
+#r_code_dir <- dirname(this.path())
+r_code_dir <- "/home/ckuetef/projects/harf-paper/R-code"
 
 # Original data directory
 # ================================
