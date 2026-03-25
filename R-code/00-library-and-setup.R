@@ -175,7 +175,7 @@ syn_tcga_tgex_dt_prefix <- file.path(syn_tcga_tgex_data_dir, "synth_tcga_tgex")
 
 # Prepare path to original currated TCGA data
 orig_tcga_data_dir <- file.path(org_tcga_tgex_data_dir, "curatedTCGAData")
-dir.create(orig_tcga_data_dir, showWarnings = FALSE)
+dir.create(orig_tcga_data_dir, showWarnings = FALSE, recursive = TRUE)
 # orig_brca_data_dir <- file.path(orig_tcga_data_dir, "BRCA")
 # dir.create(orig_brca_data_dir, showWarnings = FALSE)
 orig_luad_data_dir <- file.path(orig_tcga_data_dir, "LUAD")
