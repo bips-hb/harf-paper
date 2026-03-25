@@ -13,7 +13,7 @@ setwd(org_lake_dt_dir)
 # Problems: duplicate row names
 # Human
 # Download Lake-2016_Gene_TPM.dat and Lake-2016_Gene_TPM_Sample-annotation.txt from http://genome-tech.ucsd.edu/ZhangLab/index.php/data/epigenomics-and-transcriptomics/sns/
-system(sprintf("bash %s/lake.sh", org_lake_dt_dir))
+system(sprintf("bash ./lake.sh", org_lake_dt_dir))
 x1 = read.delim("Lake-2016_Gene_TPM.dat", "\t", header=F, stringsAsFactors=FALSE)
 ann <- read.table("Lake-2016_Gene_TPM_Sample-annotation.txt", header=T)
 gene_names <- x1[,1]

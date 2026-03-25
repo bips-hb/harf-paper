@@ -34,4 +34,8 @@ sce_dt <- as.data.table(t(assay(sce)))
 # sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, "brain_lake_processed_data.csv")
+# Remove intermediate files
+unlink("lake_not_filtered.txt")
+unlink("Lake-2016_Gene_TPM.dat")
+unlink("Lake-2016_Gene_TPM_Sample-annotation.txt")
 setwd(dirname(this.dir()))
