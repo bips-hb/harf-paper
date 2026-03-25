@@ -1,4 +1,4 @@
-source(file.path(dirname(this.dir()), "00-library-and-setup.R"))
+source(file.path(r_code_dir, "00-library-and-setup.R"))
 
 download_tcga_dt <- function(disease_code, file_nms) {
   message("Downloading and processing data for disease: ", disease_code)
@@ -108,7 +108,6 @@ download_tcga_dt <- function(disease_code, file_nms) {
 }
 
 diseases <- c(
-  "brca",  # Breast invasive carcinoma
   "luad",  # Lung adenocarcinoma
   "lusc",  # Lung squamous cell carcinoma
   "coad",  # Colon adenocarcinoma
