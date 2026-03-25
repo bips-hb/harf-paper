@@ -39,6 +39,6 @@ sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, file = org_manno_dt_file)
 # Remove intermediate files
 unlink("manno_not_filtered.txt")
-unlink("GSE76381_EmbryoMoleculeCounts.cef.txt")
-unlink("GSE76381_iPSMoleculeCounts.cef.txt")
-unlink("GSE76381_ReferenceMoleculeCounts.cef.txt")
+unlink("GSE76381_ESoMoleculeCounts.cef.txt")
+unlink("GSE76381_MouseAdultDAMoleculeCounts.cef.txt")
+unlink("GSE76381_MouseEmbryoMoleculeCounts.cef.txt")
