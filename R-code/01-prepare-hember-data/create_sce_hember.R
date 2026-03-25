@@ -8,7 +8,7 @@ create_sce_from_counts <- function(counts, colData, rowData = NULL) {
                                    rowData = rowData)
   }
   # this function writes to logcounts slot
-  exprs(sceset) <- log1p(scater::calculateCPM(sceset, size.factors = NULL))
+  exprs(sceset) <- log1p(edgeR::cpm(sceset, log = FALSE))
   # use gene names as feature symbols
   rowData(sceset)$feature_symbol <- rownames(sceset)
   # remove features with duplicated names
