@@ -25,7 +25,7 @@ library("this.path")
 library("R.utils")
 library("data.table")
 library("SingleCellExperiment")
-library("scater")
+#library("scater")
 library("rsvd")
 library("Rtsne")
 library("cowplot")
@@ -36,7 +36,7 @@ library("curatedTCGAData")
 library("SummarizedExperiment")
 # Parallel backend
 library(doParallel)
-registerDoParallel(cores = 2)
+# registerDoParallel(cores = 2)
 
 # Register cores - Windows
 # cl <- makeCluster(2)
@@ -50,6 +50,8 @@ r_code_dir <- "/home/ckuetef/projects/harf-paper/R-code"
 # Original data directory
 # ================================
 org_data_dir <- file.path(dirname(r_code_dir), "data/original")
+orig_data_dir <- "/huels_lab/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/data/original"
+
 org_hember_dt_dir <- file.path(org_data_dir, "hember-lab")
 # org_baron_dt_dir <- file.path(org_hember_dt_dir, "brain-baron")
 # org_fan_dt_dir <- file.path(org_hember_dt_dir, "embryo-fan-mouse")
