@@ -1,4 +1,6 @@
 # setwd(org_li_dt_dir)
+## Download the data from https://www.nature.com/articles/s41467-019-13025-7 and save it as "data.csv" in the same directory as this script.
+system("bash ./li.sh")
 ### DATA
 d <- read.csv("data.csv")
 

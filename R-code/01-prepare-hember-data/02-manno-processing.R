@@ -1,4 +1,3 @@
-setwd(org_manno_dt_dir)
 # Preprocess Baron et al. human pancreas data
 
 cell_data <- fread("manno_not_filtered.txt")
@@ -38,4 +37,8 @@ sce_dt <- as.data.table(t(assay(sce)))
 # sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, file = "processed_brain_manno_data.csv")
-setwd(dirname(this.dir()))
+# Remove intermediate files
+unlink("manno_not_filtered.txt")
+unlink("GSE76381_EmbryoMoleculeCounts.txt")
+unlink("GSE76381_iPSMoleculeCounts.txt")
+unlink("GSE76381_ReferenceMoleculeCounts.txt")

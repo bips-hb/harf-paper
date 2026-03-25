@@ -1,6 +1,7 @@
-# setwd(org_manno_dt_dir)
 ##### Human brain Manno et al. data preprocessing
 
+## Download data from https://www.nature.com/articles/s41467-018-04997-2#Sec15 and save the three files "GSE76381_ESMoleculeCounts.txt", "GSE76381_EmbryoMoleculeCounts.txt", and "GSE76381_iPSMoleculeCounts.txt" in the same directory as this script.
+system("bash ./manno.sh")
 ### DATA
 fix_name <- function(name){
         tmp <- strsplit(name, "_")
@@ -74,4 +75,3 @@ colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
 colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "manno_not_filtered.txt", sep = "\t")
-# setwd(dirname(this.dir()))

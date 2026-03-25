@@ -1,4 +1,3 @@
-#setwd(org_lake_dt_dir)
 # Preprocess Lake et al. human brain data
 ### DATA
 # http://genome-tech.ucsd.edu/ZhangLab/index.php/data/epigenomics-and-transcriptomics/sns/
@@ -66,4 +65,3 @@ colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "lake_not_filtered.txt", sep = "\t")
 
-#setwd(dirname(this.dir()))

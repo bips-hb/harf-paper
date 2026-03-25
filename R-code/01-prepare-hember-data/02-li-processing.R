@@ -1,6 +1,4 @@
-setwd(org_li_dt_dir)
 # Preprocess Baron et al. human pancreas data
-
 cell_data <- fread("li_not_filtered.txt")
 cell_annotation <- data.table(cell_type = cell_data$cell_type)
 cell_data$cell_type <- NULL
@@ -38,4 +36,6 @@ keep_cols <- colSums(sce_dt > 0) > min_cells
 sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, file = "processed_tissue_li_data.csv")
-setwd(dirname(this.dir()))
+# Remove intermediate files
+unlink("li_not_filtered.txt")
+unlink("data.csv")

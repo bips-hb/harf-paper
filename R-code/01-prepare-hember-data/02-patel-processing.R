@@ -38,4 +38,6 @@ sce_dt <- as.data.table(t(assay(sce)))
 # sce_dt <- sce_dt[, ..keep_cols]
 sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, file = "processed_tissue_patel_data.csv")
-setwd(dirname(this.dir()))
+# remove intermediate files
+unlink("patel_not_filtered.txt")
+unlink("data.txt")

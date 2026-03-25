@@ -1,4 +1,5 @@
-# setwd(org_patel_dt_dir)
+# Download data from https://www.nature.com/articles/s41467-018-04997-2#Sec15 and save the file "data.txt" in the same directory as this script.
+system("bash ./patel.sh")
 ### DATA
 d <- read.table("data.txt")
 # select 5 patients

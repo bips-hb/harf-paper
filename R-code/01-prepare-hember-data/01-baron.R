@@ -1,4 +1,3 @@
-# setwd(org_baron_dt_dir)
 ### DATA
 # human1
 h1 <- read.csv("GSM2230757_human1_umifm_counts.csv", header = T)
@@ -50,5 +49,3 @@ colnames(sceset_dt) <- gsub("^'|'$", "", colnames(sceset_dt))
 colnames(sceset_dt) <- gsub("-", "_", colnames(sceset_dt))
 fwrite(x = sceset_dt,
        file = "baron_not_filtered.txt", sep = "\t")
-
-# setwd(dirname(this.dir()))
