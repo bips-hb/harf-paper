@@ -39,6 +39,6 @@ sce_dt[, cell_type := sce$cell_type]
 fwrite(sce_dt, file = "processed_brain_manno_data.csv")
 # Remove intermediate files
 unlink("manno_not_filtered.txt")
-unlink("GSE76381_EmbryoMoleculeCounts.txt")
-unlink("GSE76381_iPSMoleculeCounts.txt")
-unlink("GSE76381_ReferenceMoleculeCounts.txt")
+unlink("GSE76381_EmbryoMoleculeCounts.cef.txt")
+unlink("GSE76381_iPSMoleculeCounts.cef.txt")
+unlink("GSE76381_ReferenceMoleculeCounts.cef.txt")
