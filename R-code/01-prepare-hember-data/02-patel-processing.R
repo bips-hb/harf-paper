@@ -1,4 +1,3 @@
-setwd(org_patel_dt_dir)
 # Preprocess Baron et al. human pancreas data
 
 cell_data <- fread("patel_not_filtered.txt")
