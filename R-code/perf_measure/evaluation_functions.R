@@ -25,6 +25,7 @@ suppressPackageStartupMessages({
   library(kernlab)
   library(philentropy)
   library(binom)
+  library(HiClimR)
 })
 
 source("R-code/perf_measure/utils.R")
@@ -127,7 +128,7 @@ MMD <- function(syn, real_train, real_test = NULL, seed = NULL, ...) {
 ### --- Maximum mean discrepancy (MMD) with RF kernel --------------------------
 # (needs ranger branch "completely random forests")
 MMD_RF <- function(syn, real_train, rf_train_data = "combined", normalized_kernel = FALSE, unbiased = FALSE,
-                rf_min.bucket = 2, rf_num.trees = 50,  rf_replace = FALSE, rf_sample.fraction = 1, seed = NULL, ...) {
+                   rf_min.bucket = 2, rf_num.trees = 50,  rf_replace = FALSE, rf_sample.fraction = 1, seed = NULL, ...) {
   
   
   if (rf_train_data == "real_train") {
@@ -464,6 +465,21 @@ correlation_distance <- function(syn, real_train, real_test = NULL,
     stop("Invalid choice of CD_results. Choose either 'agg' or 'all'.")
   }
 }
+
+### --- Correlation distance with fastCor ----------------------------------
+
+fastCor_dist_measure <- function (real_train, syn) {
+  # char_vars
+  char_vars <- names(which(sapply(real_train, is.character)))
+  real_train_num <- real_train[, .SD, .SDcols = -char_vars]
+  syn_num <- org_dt[, .SD, .SDcols = -char_vars]
+  real_cor <- HiClimR::fastCor(real_train_num)
+  cor_dist <- as.matrix(HiClimR::fastCor(syn_num) - real_cor)
+  cor_dist[lower.tri(cor_dist, diag = FALSE)] <- NA
+  cor_dist_mean <- mean(abs(cor_dist), na.rm = TRUE)
+  return(cor_dist_mean)
+}
+
 
 # ==============================================================================
 # Downstream utilty

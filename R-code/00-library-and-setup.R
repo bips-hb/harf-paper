@@ -19,23 +19,25 @@ if (FALSE) {
   install.packages("corrplot")
   install.packages("doParallel")
 }
-library("harf")
-library("arf")
-library("this.path")
-library("R.utils")
-library("data.table")
-library("SingleCellExperiment")
-library("scater")
-library("rsvd")
-library("Rtsne")
-library("cowplot")
-library("ggplot2")
-library("corrplot")
-library("doParallel")
-library("curatedTCGAData")
-library("SummarizedExperiment")
-# Parallel backend
-library(doParallel)
+
+suppressPackageStartupMessages({
+  library(harf)
+  library(arf)
+  library(this.path)
+  library(R.utils)
+  library(data.table)
+  library(SingleCellExperiment)
+  library(scater)
+  library(rsvd)
+  library(Rtsne)
+  library(cowplot)
+  library(ggplot2)
+  library(corrplot)
+  library(doParallel)
+  library(curatedTCGAData)
+  library(SummarizedExperiment)
+  library(doParallel)
+})
 # registerDoParallel(cores = 2)
 
 # Register cores - Windows
@@ -49,8 +51,12 @@ r_code_dir <- "/home/ckuetef/projects/harf-paper/R-code"
 
 # Original data directory
 # ================================
-# org_data_dir <- file.path(dirname(r_code_dir), "data/original")
 org_data_dir <- "/huels_lab/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/data/original"
+
+# Performance measures
+perf_dir <- file.path(dirname(r_code_dir), "perf_measure")
+source(file.path(perf_dir, "utils.R"))
+source(file.path(perf_dir, "evaluation_functions.R"))
 
 org_hember_dt_dir <- file.path(org_data_dir, "hember-lab")
 # org_baron_dt_dir <- file.path(org_hember_dt_dir, "brain-baron")
@@ -117,7 +123,7 @@ org_simlr_dt_proc_files <- c(
 )
 
 org_tcga_tgex_dt_file <- dir(org_tcga_tgex_data_dir,
-                              pattern = "*.rds", full.names = TRUE)
+                             pattern = "*.rds", full.names = TRUE)
 
 
 # Synthetic Hember et al. data directory
@@ -225,3 +231,4 @@ syn_tcga_dt_prefixes <- c(
   kirc = syn_kirc_dt_prefix,
   coad = syn_coad_dt_prefix
 )
+

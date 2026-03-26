@@ -11,9 +11,16 @@ source(file.path(this.dir(), "synthetizer_fct.R"))
 # HARF synthesizer chunk sizes for Hemberger et al. datasets
 # **********************************************************
 
+chunck_param <- seq(5, 25, by = 5)
+num_btwn_pcs <- seq(2, 6, by = 1)
+nb_trees <- seq(10, 20, by = 2)
+
+
+
+
 harf_chunck_hember <- c(
-  lake = 10,
-  manno = 10,
+  lake = c(5, 10, 15, 20, 25),
+  manno = c(5, 10, 15, 20, 25),
   li = 10,
   patel = 10,
   deng = 10
