@@ -8,7 +8,9 @@ harf_synthesizer <- function (
     ...
 ) {
   # Parallelize
-  registerDoParallel(cores = ncores <- detectCores() - 1)
+  ncores <- detectCores() - 1
+  cl <- makeCluster(ncores)
+  registerDoParallel(cores = ncores)
   # Train the HARF model
   message("Training HARF model for ", instance$data_name, "...")
   start_time <- Sys.time()

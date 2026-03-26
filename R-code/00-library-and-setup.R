@@ -33,7 +33,7 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ggplot2)
   library(corrplot)
-  library(doParallel)
+  library(parallel)
   library(curatedTCGAData)
   library(SummarizedExperiment)
   library(doParallel)
