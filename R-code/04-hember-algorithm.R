@@ -36,16 +36,16 @@ harf_synthesizer <- function (
     # Evaluate performance measures
     estimated_measures <- NULL
     UVD <- univariate_distance(
-      real_train = instance$data[, -which(colnames(instance$data) == "cell_type"), with = FALSE ],
-      syn = synth_single_cell[, -which(colnames(instance$data) == "cell_type"), with = FALSE]
+      real_train = instance$data[, -which(colnames(instance$data) == "cell_type"), drop = FALSE],
+      syn = synth_single_cell[, -which(colnames(instance$data) == "cell_type"), drop = FALSE]
     )
     CD <- fastCor_dist_measure(
-      real_train = instance$data[, -which(colnames(instance$data) == "cell_type"), with = FALSE ],
-      syn = synth_single_cell[, -which(colnames(instance$data) == "cell_type"), with = FALSE]
+      real_train = instance$data[, -which(colnames(instance$data) == "cell_type"), drop = FALSE ],
+      syn = synth_single_cell[, -which(colnames(instance$data) == "cell_type"), drop = FALSE]
     )
     MMD_rbk <- MMD(
-      real_train = instance$data[, -which(colnames(instance$data) == "cell_type"), with = FALSE ],
-      syn = synth_single_cell[, -which(colnames(instance$data) == "cell_type"), with = FALSE]
+      real_train = instance$data[, -which(colnames(instance$data) == "cell_type"), drop = FALSE ],
+      syn = synth_single_cell[, -which(colnames(instance$data) == "cell_type"), drop = FALSE]
     )
     estimated_measures <- rbind(estimated_measures,
                                 c(UVD = UVD,
