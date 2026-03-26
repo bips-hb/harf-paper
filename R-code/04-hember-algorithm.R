@@ -35,12 +35,11 @@ harf_synthesizer <- function (
     end_time <- Sys.time()
     # Evaluate performance measures
     estimated_measures <- NULL
-    print(class(instance$data))
-    print(class(synth_single_cell))
-    UVD <- univariate_distance(real_train = instance$data[ , which(colnames(instance$data) != "cell_type"), with = FALSE],
+    real_train <- as.data.table(instance$data)
+    UVD <- univariate_distance(real_train = real_train[ , which(colnames(instance$data) != "cell_type"), with = FALSE],
                                syn = synth_single_cell[ , which(colnames(synth_single_cell) != "cell_type"), with = FALSE])
-    CD <- fastCor_dist_measure(real_train = instance$data, syn = synth_single_cell)
-    MMD_rbk <- MMD(real_train = instance$data, syn = synth_single_cell)
+    CD <- fastCor_dist_measure(real_train = real_train, syn = synth_single_cell)
+    MMD_rbk <- MMD(real_train = real_train, syn = synth_single_cell)
     estimated_measures <- rbind(estimated_measures,
                                 c(UVD = UVD,
                                   CD = CD,
