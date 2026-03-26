@@ -1,4 +1,4 @@
-library(batchttols)
+library(batchtools)
 
 source(file.path(r_code_dir, "00-library-and-setup.R"))
 

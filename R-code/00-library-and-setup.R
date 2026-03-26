@@ -54,7 +54,7 @@ r_code_dir <- "/home/ckuetef/projects/harf-paper/R-code"
 org_data_dir <- "/huels_lab/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/data/original"
 
 # Performance measures
-perf_dir <- file.path(dirname(r_code_dir), "perf_measure")
+perf_dir <- file.path(r_code_dir, "perf_measure")
 source(file.path(perf_dir, "utils.R"))
 source(file.path(perf_dir, "evaluation_functions.R"))
 
