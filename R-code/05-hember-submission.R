@@ -64,4 +64,7 @@ summarizeExperiments()
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 1)
 testJob(id = id1, reg = reg)
 
-
+submitJobs(reg = reg, resources = list(walltime = 1024,
+                                       memory = 1024,
+                                       partition = partition))
+waitForJobs()
