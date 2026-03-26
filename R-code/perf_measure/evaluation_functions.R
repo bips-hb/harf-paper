@@ -472,7 +472,7 @@ fastCor_dist_measure <- function (real_train, syn) {
   # char_vars
   char_vars <- names(which(sapply(real_train, is.character)))
   real_train_num <- real_train[, .SD, .SDcols = -char_vars]
-  syn_num <- org_dt[, .SD, .SDcols = -char_vars]
+  syn_num <- real_train[, .SD, .SDcols = -char_vars]
   real_cor <- HiClimR::fastCor(real_train_num)
   cor_dist <- as.matrix(HiClimR::fastCor(syn_num) - real_cor)
   cor_dist[lower.tri(cor_dist, diag = FALSE)] <- NA
