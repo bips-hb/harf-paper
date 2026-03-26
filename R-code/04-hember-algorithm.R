@@ -98,6 +98,7 @@ arf_synthesizer <- function (
      end_time <- Sys.time()
      # Evaluate performance measures
     real_train <- as.data.table(instance$data)
+    syn_classical_data <- as.data.table(synth_classical_data)
     UVD <- univariate_distance(real_train = real_train[ , which(colnames(instance$data) != "cell_type"), with = FALSE],
     syn = synth_classical_data[ , which(colnames(synth_classical_data) != "cell_type"), with = FALSE])
     CD <- fastCor_dist_measure(real_train = real_train, syn = synth_classical_data)
