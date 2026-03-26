@@ -23,6 +23,7 @@ harf_synthesizer <- function (
     ...
   )
   # Repeat synthesize data and evaluate performance measures for 100 iterations
+  estimated_measures <- NULL
   for (i in 1:10) {
     # Only 10 iterations for testing, change to 100 for final submission
     message("synthesizing data for iteration ", i, "...\n")
@@ -37,7 +38,6 @@ harf_synthesizer <- function (
     )
     end_time <- Sys.time()
     # Evaluate performance measures
-    estimated_measures <- NULL
     real_train <- as.data.table(instance$data)
     UVD <- univariate_distance(real_train = real_train[ , which(colnames(instance$data) != "cell_type"), with = FALSE],
                                syn = synth_single_cell[ , which(colnames(synth_single_cell) != "cell_type"), with = FALSE])
