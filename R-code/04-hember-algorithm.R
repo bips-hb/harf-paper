@@ -9,7 +9,6 @@ harf_synthesizer <- function (
 ) {
   # Parallelize
   ncores <- detectCores() - 1
-  cl <- makeCluster(ncores)
   registerDoParallel(cores = ncores)
   # Train the HARF model
   message("Training HARF model for ", instance$data_name, "...")
@@ -22,11 +21,15 @@ harf_synthesizer <- function (
     verbose = TRUE,
     ...
   )
+  end_time <- Sys.time()
+  training_time_minutes <- as.numeric(difftime(end_time, start_time, units = "mins"))
   # Repeat synthesize data and evaluate performance measures for 100 iterations
   estimated_measures <- NULL
+  cols_features <- setdiff(colnames(instance$data), "cell_type")
   for (i in 1:10) {
     # Only 10 iterations for testing, change to 100 for final submission
     message("synthesizing data for iteration ", i, "...\n")
+    start_time <- Sys.time()
     synth_single_cell <- h_forge(
       harf_obj = harf_model,
       n_synth = if (instance$evidence) {1} else {nrow(instance$data)},
@@ -37,20 +40,19 @@ harf_synthesizer <- function (
     end_time <- Sys.time()
     # Evaluate performance measures
     real_train <- as.data.table(instance$data)
-    UVD <- univariate_distance(real_train = real_train[ , which(colnames(instance$data) != "cell_type"), with = FALSE],
-                               syn = synth_single_cell[ , which(colnames(synth_single_cell) != "cell_type"), with = FALSE])
+    UVD <- univariate_distance(real_train = real_train[ , ..cols_features, with = FALSE],
+                               syn = synth_single_cell[ , ..cols_features, with = FALSE])
     CD <- fastCor_dist_measure(real_train = real_train, syn = synth_single_cell)
     MMD_rbk <- MMD(real_train = real_train, syn = synth_single_cell)
     estimated_measures <- rbind(estimated_measures,
                                 c(UVD = UVD,
                                   CD = CD,
                                   MMD_rbk = MMD_rbk,
-                                  time = as.numeric(difftime(end_time, start_time, units = "mins")),
+                                  time = as.numeric(difftime(end_time, start_time, units = "mins")) + training_time_minutes,
                                   iteration = i))
     rm(synth_single_cell)
     gc()
   }
-  stopCluster(cl)
   return(data.table(Data = instance$data_name, estimated_measures))
 }
 
@@ -66,7 +68,6 @@ arf_synthesizer <- function (
 ) {
   # Parallelize
   ncores <- detectCores() - 1
-  cl <- makeCluster(ncores)
   registerDoParallel(cores = ncores)
   # Train the HARF model
   message("Training ARF model for ", instance$data_name, "...")
@@ -84,11 +85,15 @@ arf_synthesizer <- function (
     classical_arf,
     instance$data
   )
+  end_time <- Sys.time()
+  training_time_minutes <- as.numeric(difftime(end_time, start_time, units = "mins"))
   # Repeat synthesize data and evaluate performance measures for 100 iterations
   estimated_measures <- NULL
+  cols_features <- setdiff(colnames(instance$data), "cell_type")
   for (i in 1:10) {
     # Only 10 iterations for testing, change to 100 for final submission
     message("synthesizing data for iteration ", i, "...\n")
+    start_time <- Sys.time()
     synth_classical_data <- forge(
       classical_forde,
       n_synth = if (instance$evidence) {1} else {nrow(instance$data)},
@@ -99,19 +104,18 @@ arf_synthesizer <- function (
      # Evaluate performance measures
     real_train <- as.data.table(instance$data)
     synth_classical_data <- as.data.table(synth_classical_data)
-    UVD <- univariate_distance(real_train = real_train[ , which(colnames(instance$data) != "cell_type"), with = FALSE],
-    syn = synth_classical_data[ , which(colnames(synth_classical_data) != "cell_type"), with = FALSE])
+    UVD <- univariate_distance(real_train = real_train[ , ..cols_features, with = FALSE],
+    syn = synth_classical_data[ , ..cols_features, with = FALSE])
     CD <- fastCor_dist_measure(real_train = real_train, syn = synth_classical_data)
     MMD_rbk <- MMD(real_train = real_train, syn = synth_classical_data)
     estimated_measures <- rbind(estimated_measures,
                                 c(UVD = UVD,
                                   CD = CD,
                                   MMD_rbk = MMD_rbk,
-                                  time = as.numeric(difftime(end_time, start_time, units = "mins")),
+                                  time = as.numeric(difftime(end_time, start_time, units = "mins")) + training_time_minutes,
                                   iteration = i))
     rm(synth_classical_data)
     gc()
   }
-  stopCluster(cl)
   return(data.table(Data = instance$data_name, estimated_measures))
 }
