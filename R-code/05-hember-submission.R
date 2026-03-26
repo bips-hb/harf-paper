@@ -41,7 +41,7 @@ addProblem(name = "patel",
            reg = reg)
 
 # 3. Add algorithms to registry
-#addAlgorithm(name = "harf_synthesizer", fun = harf_synthesizer, reg = reg)
+addAlgorithm(name = "harf_synthesizer", fun = harf_synthesizer, reg = reg)
 addAlgorithm(name = "arf_synthesizer", fun = arf_synthesizer, reg = reg)
 
 # 4. Parameter design
@@ -53,7 +53,7 @@ ades <- expand.grid(
   chunck_size = c(5, 10, 15, 20, 25),
   num_btwn_pcs = c(2, 3, 4, 5)
 )
-ades <- list(harf_synthesizer = ades)
+ades <- list(harf_synthesizer = ades, arf_synthesizer = ades)
 # 6. Add experiments to registry
 addExperiments(reg = reg,
                prob.designs = pdes,
@@ -62,7 +62,7 @@ addExperiments(reg = reg,
 summarizeExperiments()
 
 # 7. Test before submitting to cluster
-id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 1)
+id1 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 testJob(id = id1, reg = reg)
 
 # submitJobs(reg = reg, resources = list(walltime = 36:59:00,

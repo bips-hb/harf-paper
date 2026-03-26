@@ -80,7 +80,6 @@ arf_synthesizer <- function (
     ...
   )
   # forde
-  message("synthesizing data for iteration ", i, "...\n")
   classical_forde <- forde(
     classical_arf,
     instance$data
