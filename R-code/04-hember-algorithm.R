@@ -35,6 +35,7 @@ harf_synthesizer <- function (
     end_time <- Sys.time()
     # Evaluate performance measures
     estimated_measures <- NULL
+    synth_single_cell <- as.data.frame(synth_single_cell)
     UVD <- univariate_distance(
       real_train = instance$data[, -which(colnames(instance$data) == "cell_type"), drop = FALSE],
       syn = synth_single_cell[, -which(colnames(instance$data) == "cell_type"), drop = FALSE]
