@@ -9,6 +9,7 @@ makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
 template <- "~/batchtools/batchtools.slurm.tmpl"
 partition <- "week-long-cpu"
 
+unlink(file.path(reg_dir, "hember"), recursive = FALSE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "hember"),
   conf.file = "~/batchtools/batchtools.conf.R",
@@ -25,38 +26,42 @@ reg <- makeExperimentRegistry(
 addProblem(name = "lake", 
            data = list(file_name = org_hember_dt_files["lake"], data_names = "lake"), 
            fun = create_single_cell_data,
-           registry = reg)
+           reg = reg)
 addProblem(name = "manno", 
            data = list(file_name = org_hember_dt_files["manno"], data_names = "manno"), 
            fun = create_single_cell_data,
-           registry = reg)
+           reg = reg)
 addProblem(name = "li",
            data = list(file_name = org_hember_dt_files["li"], data_names = "li"), 
            fun = create_single_cell_data,
-           registry = reg)
+           reg = reg)
 addProblem(name = "patel",
            data = list(file_name = org_hember_dt_files["patel"], data_names = "patel"),
            fun = create_single_cell_data,
-           registry = reg)
+           reg = reg)
 
 # 3. Add algorithms to registry
-addAlgorithm(name = "harf_synthesizer", fun = harf_synthesizer, registry = reg)
+addAlgorithm(name = "harf_synthesizer", fun = harf_synthesizer, reg = reg)
 
 # 4. Parameter design
-hember_pdes <- data.frame(evidence = c(FALSE, TRUE))
-
+pdes <- data.frame(evidence = c(FALSE, TRUE))
+pdes <- list(lake = pdes, manno = pdes, li = pdes, patel = pdes)
 # 5. Algorithm design
-hember_ades <- expand.grid(
+ades <- expand.grid(
   num_trees = 10,
   chunck_size = c(5, 10, 15, 20, 25),
   num_btwn_pcs = c(2, 3, 4, 5)
 )
-
+ades <- list(harf_synthesizer = ades)
 # 6. Add experiments to registry
 addExperiments(reg = reg,
-               prob.designs = hember_pdes,
-               algo.designs = hember_ades, repls = 10)
+               prob.designs = pdes,
+               algo.designs = ades,
+               repls = 10)
 summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 1)
+testJob(id = id1, reg = reg)
+
+

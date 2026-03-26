@@ -15,6 +15,8 @@ create_single_cell_data <- function (
   # Read data.table
   org_dt <- as.data.frame(fread(data$file_name, check.names = FALSE))
   colnames(org_dt) <- make.names(colnames(org_dt), unique = TRUE)
+  # Use 100 gene expressions and cell type for testing
+  org_dt <- org_dt[, c(1:100, which(colnames(org_dt) == "cell_type"))]
   n <- nrow(org_dt)
   return(list(data = org_dt,
               file_name = data$file_name, 
