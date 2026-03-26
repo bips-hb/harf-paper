@@ -1,6 +1,8 @@
 library(batchtools)
 
 source(file.path(r_code_dir, "00-library-and-setup.R"))
+source(file.path(r_code_dir, "03-hember-problem.R"))
+source(file.path(r_code_dir, "04-hember-algorithm.R"))
 
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
 makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
@@ -8,7 +10,7 @@ template <- "~/batchtools/batchtools.slurm.tmpl"
 partition <- "week-long-cpu"
 
 reg <- makeExperimentRegistry(
-  file.dir = "/huels_lab/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/registry/harf-paper",
+  file.dir = file.path(reg_dir, "hember"),
   conf.file = "~/batchtools/batchtools.conf.R",
   packages = character(0L),
   source = c(
