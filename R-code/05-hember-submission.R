@@ -62,11 +62,13 @@ addExperiments(reg = reg,
 summarizeExperiments()
 
 # 7. Test before submitting to cluster
-id1 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
+id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 1)
 testJob(id = id1, reg = reg)
+id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
+testJob(id = id2, reg = reg)
 
-# submitJobs(reg = reg, resources = list(walltime = 36:59:00,
-#                                        memory = 1024,
-#                                         ncpus = 10,
-#                                        partition = partition))
-# waitForJobs()
+submitJobs(reg = reg, resources = list(walltime = "36:59:00",
+                                       memory = 1024,
+                                        ncpus = 10,
+                                       partition = partition))
+waitForJobs()

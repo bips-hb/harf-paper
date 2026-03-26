@@ -26,7 +26,7 @@ harf_synthesizer <- function (
   # Repeat synthesize data and evaluate performance measures for 100 iterations
   estimated_measures <- NULL
   cols_features <- setdiff(colnames(instance$data), "cell_type")
-  for (i in 1:10) {
+  for (i in 1:100) {
     # Only 10 iterations for testing, change to 100 for final submission
     message("synthesizing data for iteration ", i, "...\n")
     start_time <- Sys.time()
@@ -90,7 +90,7 @@ arf_synthesizer <- function (
   # Repeat synthesize data and evaluate performance measures for 100 iterations
   estimated_measures <- NULL
   cols_features <- setdiff(colnames(instance$data), "cell_type")
-  for (i in 1:10) {
+  for (i in 1:100) {
     # Only 10 iterations for testing, change to 100 for final submission
     message("synthesizing data for iteration ", i, "...\n")
     start_time <- Sys.time()
