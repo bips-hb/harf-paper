@@ -29,10 +29,8 @@ harf_synthesizer <- function (
     message("synthesizing data for iteration ", i, "...\n")
     synth_single_cell <- h_forge(
       harf_obj = harf_model,
-      n_synth = nrow(instance$data),
-      evidence = if (instance$evidence) {
-        data.frame(cell_type = instance$data$cell_type)
-      } else {NULL},
+      n_synth = if (instance$evidence) {1} else {nrow(instance$data)},
+      evidence = if (instance$evidence) {data.frame(cell_type = instance$data$cell_type)} else {NULL},
       parallel = TRUE,
       verbose = TRUE
     )
@@ -49,6 +47,8 @@ harf_synthesizer <- function (
                                   MMD_rbk = MMD_rbk,
                                   time = as.numeric(difftime(end_time, start_time, units = "mins")),
                                   iteration = i))
+    rm(synth_single_cell)
+    gc()
   }
   stopCluster(cl)
   return(data.table(Data = instance$data_name, estimated_measures))
@@ -59,55 +59,59 @@ harf_synthesizer <- function (
 # ========================
 # Function to synthesize all Hemberger et al. datasets with ARF
 arf_synthesizer <- function (
-    dt_name = "",
-    org_file_paths,
-    syn_file_prfxs,
-    parallel = FALSE,
-    verbose = FALSE,
-    i = 1
+    data,
+    job,
+    instance,
+    ...
 ) {
-  org_file_path <- org_file_paths[dt_name]
-  syn_file_prfx <- syn_file_prfxs[dt_name]
-  # Read original data
-  org_dt <- as.data.frame(fread(org_file_path, check.names = FALSE))
-  colnames(org_dt) <- make.names(colnames(org_dt), unique = TRUE)
-  n <- nrow(org_dt)
-  # Train ARF models
-  message("Training ARF model for ", basename(org_file_path), "...\n")
+  # Parallelize
+  ncores <- detectCores() - 1
+  cl <- makeCluster(ncores)
+  registerDoParallel(cores = ncores)
+  # Train the HARF model
+  message("Training ARF model for ", instance$data_name, "...")
   start_time <- Sys.time()
   classical_arf <- adversarial_rf(
-    x = org_dt,
-    num_trees = 10,
-    min_node_size = 5,
+    x = instance$data,
     prune = TRUE,
     delta = 0,
-    verbose = verbose
+    verbose = TRUE,
+    parallel = TRUE,
+    ...
   )
   # forde
-  message("Forde for ", basename(org_file_path), "...\n")
+  message("synthesizing data for iteration ", i, "...\n")
   classical_forde <- forde(
     classical_arf,
-    org_dt
+    instance$data
   )
-  # Unconditional synthesis for classical ARF
-  message("Synthesizing data for ", basename(org_file_path), "...\n")
-  synth_classical_data <- forge(
-    classical_forde,
-    n_synth = n
-  )
-  end_time <- Sys.time()
-  runtime_minutes <- as.numeric(difftime(end_time, start_time, units = "mins"))
-  fil_nm <- sprintf("%s_arf%02d.csv", syn_file_prfx, i)
-  message("Writing synthesized data to ", fil_nm, "...\n")
-  fwrite(
-    synth_classical_data,
-    file = fil_nm
-  )
-  return(c(dt_name = dt_name,
-           runtime = runtime_minutes,
-           file_name = fil_nm))
+  # Repeat synthesize data and evaluate performance measures for 100 iterations
+  estimated_measures <- NULL
+  for (i in 1:10) {
+    # Only 10 iterations for testing, change to 100 for final submission
+    message("synthesizing data for iteration ", i, "...\n")
+    synth_classical_data <- forge(
+      classical_forde,
+      n_synth = if (instance$evidence) {1} else {nrow(instance$data)},
+      evidence = if (instance$evidence) {data.frame(cell_type = instance$data$cell_type)} else {NULL},
+      parallel = TRUE
+    )
+     end_time <- Sys.time()
+     # Evaluate performance measures
+    real_train <- as.data.table(instance$data)
+    UVD <- univariate_distance(real_train = real_train[ , which(colnames(instance$data) != "cell_type"), with = FALSE],
+    syn = synth_classical_data[ , which(colnames(synth_classical_data) != "cell_type"), with = FALSE])
+    CD <- fastCor_dist_measure(real_train = real_train, syn = synth_classical_data)
+    MMD_rbk <- MMD(real_train = real_train, syn = synth_classical)
+    estimated_measures <- rbind(estimated_measures,
+                                c(UVD = UVD,
+                                  CD = CD,
+                                  MMD_rbk = MMD_rbk,
+                                  time = as.numeric(difftime(end_time, start_time, units = "mins")),
+                                  iteration = i))
+    rm(synth_classical_data)
+    gc()
+  }
+  stopCluster(cl)
+  return(data.table(Data = instance$data_name, estimated_measures))
 }
-
-# Synpop synthesizer function
-# ===========================
-# TODO: Implement Synpop synthesizer function
