@@ -50,7 +50,7 @@ pdes <- list(lake = pdes, manno = pdes, li = pdes, patel = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
   num_trees = 10,
-  chunck_size = c(5, 10, 15, 20, 25),
+  chunck_size = c(100),
   num_btwn_pcs = c(2, 3, 4, 5)
 )
 ades <- list(harf_synthesizer = ades, arf_synthesizer = ades)
@@ -64,11 +64,15 @@ summarizeExperiments()
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 1)
 testJob(id = id1, reg = reg)
-id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
-testJob(id = id2, reg = reg)
 
-submitJobs(reg = reg, resources = list(walltime = "36:59:00",
-                                       memory = 1024,
-                                        ncpus = 10,
+id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
+# testJob(id = id2, reg = reg)
+
+ids <- findExperiments()
+submitJobs(reg = reg, 
+           ids = ids[ , chunk := chunk(job.id, chunk.size = 800)],
+           resources = list(walltime = "12:00:00",
+                                       memory = "5g",
+                                        ncpus = 5,
                                        partition = partition))
-waitForJobs()
+waitForJobs(reg = reg)

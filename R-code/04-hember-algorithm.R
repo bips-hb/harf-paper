@@ -26,10 +26,11 @@ harf_synthesizer <- function (
   # Repeat synthesize data and evaluate performance measures for 100 iterations
   estimated_measures <- NULL
   cols_features <- setdiff(colnames(instance$data), "cell_type")
-  for (i in 1:100) {
+  for (i in 1:5) {
     # Only 10 iterations for testing, change to 100 for final submission
     message("synthesizing data for iteration ", i, "...\n")
     start_time <- Sys.time()
+    registerDoParallel(cores = 2)
     synth_single_cell <- h_forge(
       harf_obj = harf_model,
       n_synth = if (instance$evidence) {1} else {nrow(instance$data)},
