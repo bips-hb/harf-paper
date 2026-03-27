@@ -13,7 +13,7 @@ harf_synthesizer <- function(data, job, instance, ...) {
     omx_data = instance$data[, -which(colnames(instance$data) == "cell_type")],
     cli_lab_data = data.frame(cell_type = instance$data$cell_type),
     feature_ordering = colnames(instance$data),
-    parallel = TRUE,   
+    parallel = FALSE,   
     verbose = TRUE,
     ...
   )
@@ -38,7 +38,7 @@ harf_synthesizer <- function(data, job, instance, ...) {
       harf_obj = harf_model,
       n_synth = if (instance$evidence) 1 else nrow(instance$data),
       evidence = if (instance$evidence) data.frame(cell_type = instance$data$cell_type) else NULL,
-      parallel = TRUE,   
+      parallel = FALSE,   
       verbose = TRUE
     )
     
@@ -90,7 +90,7 @@ arf_synthesizer <- function(data, job, instance, ...) {
     prune = TRUE,
     delta = 0,
     verbose = TRUE,
-    parallel = TRUE,   
+    parallel = FALSE,   
     ...
   )
   
@@ -119,7 +119,7 @@ arf_synthesizer <- function(data, job, instance, ...) {
       classical_forde,
       n_synth = if (instance$evidence) 1 else nrow(instance$data),
       evidence = if (instance$evidence) data.frame(cell_type = instance$data$cell_type) else NULL,
-      parallel = TRUE   
+      parallel = FALSE   
     )
     
     real_train <- as.data.table(instance$data)
