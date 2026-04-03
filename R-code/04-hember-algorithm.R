@@ -24,7 +24,7 @@ harf_synthesizer <- function(data, job, instance, ...) {
   # Prepare for data synthesis
   # -------------------------------
   cols_features <- setdiff(colnames(instance$data), "cell_type")
-  n_iter <- 2   # use 100 for full run
+  n_iter <- 20   # use 100 for full run
   results_list <- vector("list", n_iter)
   
   # -------------------------------

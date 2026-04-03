@@ -70,8 +70,7 @@ id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 
 
 ids <- findExperiments()
 submitJobs(reg = reg, 
-           # ids = ids[job.id == 176 , chunk := chunk(job.id, chunk.size = 800)],
-           ids = ids[job.id == 176, ],
+           ids = ids[, chunk := chunk(job.id, chunk.size = 100)],
            resources = list(walltime = "120:00:00",
                             memory = 1024*2,
                             ncpus = 1,
@@ -86,8 +85,8 @@ ids_failed <- findErrors(reg = reg)
 if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
   submitJobs(reg = reg, ids = ids_failed[1,], 
-             resources = list(walltime = "120:00:00",
-                              memory = 1024*2,
+             resources = list(walltime = "80:00:00",
+                              memory = 1024,
                               ncpus = 1,
                               partition = partition))
 }
