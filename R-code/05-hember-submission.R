@@ -91,3 +91,20 @@ if (length(ids_failed) > 0) {
                               partition = partition))
 }
 
+# 8. Collect results
+ids <- findExperiments(algo.name = "harf_synthesizer", reg = reg)
+ids_done <- findDone(ids, reg = reg)
+# Load and flat job paramters
+job_pars <- getJobPars(ids_done, reg = reg)
+job_pars_algo <- rbindlist(job_pars$algo.pars, idcol = "job.id", fill = TRUE)
+job_pars_prob <- rbindlist(job_pars$prob.pars, idcol = "job.id", fill = TRUE)
+job_pars_DT <- merge(job_pars_algo, job_pars_prob, by = "job.id")
+# Load and flat results
+res_harf <- reduceResultsList(ids = ids_done, reg = reg)
+res_harf_DT <- rbindlist(res_harf, idcol = "job.id")
+res_harf_DT$algorithm <- "HARF"
+res_harf_DT <- merge(res_harf_DT, job_pars_DT, by = "job.id")
+saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_hember_results.rds"))
+
+
+

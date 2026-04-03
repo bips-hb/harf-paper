@@ -54,6 +54,7 @@ r_code_dir <- "/home/ckuetef/projects/harf-paper/R-code"
 # Original data directory
 # ================================
 org_data_dir <- "/huels_lab/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/data/original"
+res_dir <- file.path(dirname(dirname(org_data_dir)), "results")
 reg_dir <- "/huels_lab/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/registry/harf-paper"
 # Performance measures
 perf_dir <- file.path(r_code_dir, "perf_measure")
@@ -61,6 +62,8 @@ source(file.path(perf_dir, "utils.R"))
 source(file.path(perf_dir, "evaluation_functions.R"))
 
 org_hember_dt_dir <- file.path(org_data_dir, "hember-lab")
+res_hember_dt_dir <- file.path(res_dir, "hember-lab")
+dir.create(res_hember_dt_dir, recursive = TRUE, showWarnings = FALSE)
 # org_baron_dt_dir <- file.path(org_hember_dt_dir, "brain-baron")
 # org_fan_dt_dir <- file.path(org_hember_dt_dir, "embryo-fan-mouse")
 org_lake_dt_dir <- file.path(org_hember_dt_dir, "brain-lake")
