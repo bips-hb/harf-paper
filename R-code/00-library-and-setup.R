@@ -18,6 +18,7 @@ if (FALSE) {
   install.packages("ggplot2")
   install.packages("corrplot")
   install.packages("doParallel")
+  install.packages("batchtools")
 }
 
 suppressPackageStartupMessages({
@@ -37,6 +38,7 @@ suppressPackageStartupMessages({
   library(curatedTCGAData)
   library(SummarizedExperiment)
   library(doParallel)
+  library(batchtools)
 })
 # registerDoParallel(cores = 2)
 

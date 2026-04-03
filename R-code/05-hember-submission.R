@@ -53,7 +53,7 @@ ades <- expand.grid(
   chunck_size = c(25, 50, 75, 100),
   num_btwn_pcs = c(2, 3, 4, 5)
 )
-ades <- list(harf_synthesizer = ades, arf_synthesizer = ades)
+ades <- list(harf_synthesizer = ades, arf_synthesizer = data.frame(num_trees = 10))
 # 6. Add experiments to registry
 addExperiments(reg = reg,
                prob.designs = pdes,
@@ -63,16 +63,31 @@ summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 1)
-testJob(id = id1, reg = reg)
+# testJob(id = id1, reg = reg)
 
-id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
+# id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
 
 ids <- findExperiments()
 submitJobs(reg = reg, 
            ids = ids[ , chunk := chunk(job.id, chunk.size = 800)],
-           resources = list(walltime = "12:00:00",
-                                       memory = "1g",
-                                        ncpus = 2,
-                                       partition = partition))
+           resources = list(walltime = "120:00:00",
+                            memory = 1024*2,
+                            ncpus = 1,
+                            partition = partition))
 waitForJobs(reg = reg)
+
+# ============================
+# Resubmission for failed jobs
+# ============================
+reg <- loadRegistry(file.path(reg_dir, "hember"), writeable = TRUE)
+ids_failed <- findErrors(reg = reg)
+if (length(ids_failed) > 0) {
+  message("Resubmitting failed jobs...")
+  submitJobs(reg = reg, ids = ids_failed[1,], 
+             resources = list(walltime = "120:00:00",
+                              memory = 1024*2,
+                              ncpus = 1,
+                              partition = partition))
+}
+
