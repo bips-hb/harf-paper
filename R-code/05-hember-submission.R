@@ -9,9 +9,9 @@ makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
 template <- "~/batchtools/batchtools.slurm.tmpl"
 partition <- "week-long-cpu"
 
-unlink(file.path(reg_dir, "hember"), recursive = TRUE)
+unlink(file.path(reg_dir, "hember-test"), recursive = TRUE)
 reg <- makeExperimentRegistry(
-  file.dir = file.path(reg_dir, "hember"),
+  file.dir = file.path(reg_dir, "hember-test"),
   conf.file = "~/batchtools/batchtools.conf.R",
   packages = character(0L),
   source = c(
@@ -99,12 +99,27 @@ job_pars <- getJobPars(ids_done, reg = reg)
 job_pars_algo <- rbindlist(job_pars$algo.pars, idcol = "job.id", fill = TRUE)
 job_pars_prob <- rbindlist(job_pars$prob.pars, idcol = "job.id", fill = TRUE)
 job_pars_DT <- merge(job_pars_algo, job_pars_prob, by = "job.id")
-# Load and flat results
+# Load and flat results for HARF
 res_harf <- reduceResultsList(ids = ids_done, reg = reg)
 res_harf_DT <- rbindlist(res_harf, idcol = "job.id")
 res_harf_DT$algorithm <- "HARF"
 res_harf_DT <- merge(res_harf_DT, job_pars_DT, by = "job.id")
 saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_hember_results.rds"))
+
+# Load and flat results for ARF
+ids <- findExperiments(algo.name = "arf_synthesizer", reg = reg)
+ids_done <- findDone(ids, reg = reg)
+res_arf <- reduceResultsList(ids = ids_done, reg = reg)
+res_arf_DT <- rbindlist(res_arf, idcol = "job.id")
+res_arf_DT$algorithm <- "ARF"
+res_arf_DT <- merge(res_arf_DT, job_pars_DT, by = "job.id")
+res_arf_DT$chunck_size <- 0
+saveRDS(res_arf_DT, file.path(res_hember_dt_dir, "arf_hember_results.rds"))
+
+# Rbind HARF and ARF results
+res_all_DT <- rbind(res_harf_DT, res_arf_DT)
+saveRDS(res_all_DT, file.path(res_hember_dt_dir,
+                              "harf_arf_hember_results.rds"))
 
 
 
