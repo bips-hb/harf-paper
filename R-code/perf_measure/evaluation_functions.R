@@ -28,8 +28,6 @@ suppressPackageStartupMessages({
   library(HiClimR)
 })
 
-source("R-code/perf_measure/utils.R")
-
 # ==============================================================================
 # Distributional similarity
 # ==============================================================================

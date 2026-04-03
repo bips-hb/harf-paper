@@ -62,15 +62,16 @@ addExperiments(reg = reg,
 summarizeExperiments()
 
 # 7. Test before submitting to cluster
-id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 1)
-# testJob(id = id1, reg = reg)
+id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 175)[1, ]
+ testJob(id = id1, reg = reg)
 
 # id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
 
 ids <- findExperiments()
 submitJobs(reg = reg, 
-           ids = ids[ , chunk := chunk(job.id, chunk.size = 800)],
+           # ids = ids[job.id == 176 , chunk := chunk(job.id, chunk.size = 800)],
+           ids = ids[job.id == 176, ],
            resources = list(walltime = "120:00:00",
                             memory = 1024*2,
                             ncpus = 1,
