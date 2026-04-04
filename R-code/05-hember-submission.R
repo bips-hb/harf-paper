@@ -7,11 +7,11 @@ source(file.path(r_code_dir, "04-hember-algorithm.R"))
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
 makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
 template <- "~/batchtools/batchtools.slurm.tmpl"
-partition <- "week-long-cpu"
+partition <- "day-long-cpu"
 
-unlink(file.path(reg_dir, "hember-test"), recursive = TRUE)
+unlink(file.path(reg_dir, "hember"), recursive = TRUE)
 reg <- makeExperimentRegistry(
-  file.dir = file.path(reg_dir, "hember-test"),
+  file.dir = file.path(reg_dir, "hember"),
   conf.file = "~/batchtools/batchtools.conf.R",
   packages = character(0L),
   source = c(
@@ -58,21 +58,21 @@ ades <- list(harf_synthesizer = ades, arf_synthesizer = data.frame(num_trees = 1
 addExperiments(reg = reg,
                prob.designs = pdes,
                algo.designs = ades,
-               repls = 5)
+               repls = 100)
 summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 175)[1, ]
- testJob(id = id1, reg = reg)
+ # testJob(id = id1, reg = reg)
 
 # id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
 
 ids <- findExperiments()
 submitJobs(reg = reg, 
-           ids = ids[, chunk := chunk(job.id, chunk.size = 100)],
-           resources = list(walltime = "120:00:00",
-                            memory = 1024*2,
+           ids = ids[, chunk := chunk(job.id, chunk.size = 400)],
+           resources = list(walltime = "23:50:00",
+                            memory = 1024,
                             ncpus = 1,
                             partition = partition))
 waitForJobs(reg = reg)
@@ -85,7 +85,7 @@ ids_failed <- findErrors(reg = reg)
 if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
   submitJobs(reg = reg, ids = ids_failed[1,], 
-             resources = list(walltime = "80:00:00",
+             resources = list(walltime = "48:00:00",
                               memory = 1024,
                               ncpus = 1,
                               partition = partition))
