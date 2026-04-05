@@ -1,13 +1,14 @@
 
 
 cluster_and_eval <- function(sc_data) {
+  sc_data <- as.data.frame(sc_data)  # Ensure it's a data.frame
   # ️Identify the cell type column
   cell_type_var <- sapply(sc_data, is.character) | sapply(sc_data, is.factor)
   cell_type_col <- which(cell_type_var)[1]          # Take the first factor/character column
   true_labels <- sc_data[[cell_type_col]]
   
   #  Create SingleCellExperiment object
-  counts_matrix <- t(as.matrix(sc_data[, -cell_type_col]))
+  counts_matrix <- t(as.matrix(sc_data[, - cell_type_col]))
   sce <- SingleCellExperiment(assays = list(counts = counts_matrix))
   
   #  Log-normalization

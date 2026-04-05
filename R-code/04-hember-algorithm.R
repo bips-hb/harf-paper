@@ -8,7 +8,7 @@ harf_synthesizer <- function(data, job, instance, ...) {
   # -------------------------------
   message("Training HARF model for ", instance$data_name, "...")
   # Test with the first 50 features and cell type for faster training
-  instance$data <- instance$data[, c(1:50, which(colnames(instance$data) == "cell_type"))]
+  # instance$data <- instance$data[, c(1:50, which(colnames(instance$data) == "cell_type"))]
   start_time <- Sys.time()
   
   harf_model <- h_arf(
@@ -73,10 +73,6 @@ harf_synthesizer <- function(data, job, instance, ...) {
       cluster_and_eval(sc_data = synth_single_cell),
       error = function(e) c(ARI = NA_real_, NMI = NA_real_)
     )
-    print(ari_nmi_org)
-    print(ari_nmi_harf)
-    print(dim(synth_single_cell))
-    print(dim(instance$data))
     ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_harf)
     
     results_list[[i]] <- data.table(
@@ -85,8 +81,12 @@ harf_synthesizer <- function(data, job, instance, ...) {
       UVD = UVD,
       CD = CD,
       MMD_rbk = MMD_rbk,
-      ARI = ari_nmi_diff["ARI"],
-      NMI = ari_nmi_diff["NMI"],
+      ARI_ORG = ari_nmi_org["ARI"],
+      NMI_ORG = ari_nmi_org["NMI"],
+      ARI_HARF = ari_nmi_harf["ARI"],
+      NMI_HARF = ari_nmi_harf["NMI"],
+      ARI_DIFF = ari_nmi_diff["ARI"],
+      NMI_DIFF = ari_nmi_diff["NMI"],
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes
     )
     # Clean up memory
@@ -187,6 +187,10 @@ arf_synthesizer <- function(data, job, instance, ...) {
       UVD = UVD,
       CD = CD,
       MMD_rbk = MMD_rbk,
+      ARI_ORG = ari_nmi_org["ARI"],
+      NMI_ORG = ari_nmi_org["NMI"],
+      ARI_ARF = ari_nmi_arf["ARI"],
+      NMI_ARF = ari_nmi_arf["NMI"],
       ARI = ari_nmi_diff["ARI"],
       NMI = ari_nmi_diff["NMI"],
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes
