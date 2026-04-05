@@ -75,6 +75,8 @@ harf_synthesizer <- function(data, job, instance, ...) {
     )
     print(ari_nmi_org)
     print(ari_nmi_harf)
+    print(dim(synth_single_cell))
+    print(dim(instance$data))
     ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_harf)
     
     results_list[[i]] <- data.table(
