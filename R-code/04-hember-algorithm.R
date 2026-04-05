@@ -42,6 +42,8 @@ harf_synthesizer <- function(data, job, instance, ...) {
       verbose = TRUE
     )
     
+    iter_end <- Sys.time()
+    
     real_train <- as.data.table(instance$data)
     
     # Compute performance measures
@@ -50,10 +52,26 @@ harf_synthesizer <- function(data, job, instance, ...) {
       syn = synth_single_cell[, ..cols_features]
     )
     
-    CD <- fastCor_dist_measure(real_train = real_train, syn = synth_single_cell)
-    MMD_rbk <- MMD(real_train = real_train, syn = synth_single_cell)
+    CD <- tryCatch(
+      fastCor_dist_measure(real_train = real_train, syn = synth_single_cell),
+      error = function(e) NA_real_
+    )
     
-    iter_end <- Sys.time()
+    MMD_rbk <- tryCatch(
+      MMD(real_train = real_train, syn = synth_single_cell),
+      error = function(e) NA_real_
+    )
+    
+    ari_nmi_org <- tryCatch(
+      cluster_and_eval(sc_data = instance$data),
+      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+    )
+
+    ari_nmi_harf <- tryCatch(
+      cluster_and_eval(sc_data = synth_single_cell),
+      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+    )
+    ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_harf)
     
     results_list[[i]] <- data.table(
       Data = instance$data_name,
@@ -61,9 +79,10 @@ harf_synthesizer <- function(data, job, instance, ...) {
       UVD = UVD,
       CD = CD,
       MMD_rbk = MMD_rbk,
+      ARI = ari_nmi_diff["ARI"],
+      NMI = ari_nmi_diff["NMI"],
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes
     )
-    
     # Clean up memory
     rm(synth_single_cell)
     gc()

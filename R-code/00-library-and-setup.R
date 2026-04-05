@@ -17,6 +17,8 @@ if (FALSE) {
   BiocManager::install(c("curatedTCGAData", "SummarizedExperiment"))
   install.packages("ggplot2")
   install.packages("corrplot")
+  install.packages("mclust")
+  install.packages("aricode")
   install.packages("doParallel")
   install.packages("batchtools")
 }
@@ -37,6 +39,8 @@ suppressPackageStartupMessages({
   library(parallel)
   library(curatedTCGAData)
   library(SummarizedExperiment)
+  library(mclust)
+  library(aricode)
   library(doParallel)
   library(batchtools)
 })

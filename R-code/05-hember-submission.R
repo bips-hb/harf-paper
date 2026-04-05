@@ -6,7 +6,6 @@ source(file.path(r_code_dir, "04-hember-algorithm.R"))
 
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
 makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
-template <- "~/batchtools/batchtools.slurm.tmpl"
 partition <- "day-long-cpu"
 
 unlink(file.path(reg_dir, "hember"), recursive = TRUE)
@@ -14,10 +13,12 @@ reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "hember"),
   conf.file = "~/batchtools/batchtools.conf.R",
   packages = character(0L),
+  work.dir = "/home/ckuetef/projects/harf-paper/R-code",
   source = c(
     file.path(r_code_dir, "00-library-and-setup.R"),
     file.path(perf_dir, "utils.R"),
-    file.path(perf_dir, "evaluation_functions.R")
+    file.path(perf_dir, "evaluation_functions.R"),
+    file.path(perf_dir, "cluster-and-avel.R"),
   ),
   seed = 123
 )
@@ -69,24 +70,28 @@ id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 
 # testJob(id = id2, reg = reg)
 
 ids <- findExperiments()
-submitJobs(reg = reg, 
-           ids = ids[, chunk := chunk(job.id, chunk.size = 400)],
+ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
+submitJobs(reg = reg, ids = ids,
            resources = list(walltime = "23:50:00",
                             memory = 1024,
                             ncpus = 1,
-                            partition = partition))
+                            partition = partition,
+                            ntasks = 1,
+                            name = "harf_hember"))
 waitForJobs(reg = reg)
 
 # ============================
 # Resubmission for failed jobs
 # ============================
 reg <- loadRegistry(file.path(reg_dir, "hember"), writeable = TRUE)
-ids_failed <- findErrors(reg = reg)
+ids_expired <- findExpired(reg = reg)
+ids_error <- findErrors(reg = reg)
+ids_failed <- rbind(ids_expired, ids_error)
 if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
-  submitJobs(reg = reg, ids = ids_failed[1,], 
-             resources = list(walltime = "48:00:00",
-                              memory = 1024,
+  submitJobs(reg = reg, ids = ids_failed, 
+             resources = list(walltime = "23:59:00",
+                              memory = 1024 * 3,
                               ncpus = 1,
                               partition = partition))
 }
