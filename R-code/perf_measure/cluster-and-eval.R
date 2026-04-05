@@ -30,5 +30,5 @@ cluster_and_eval <- function(sc_data) {
   nmi <- NMI(predicted_clusters, sce$cell_type)
   
   #  Return as a list
-  return(list(ARI = ari, NMI = nmi))
+  return(c(ARI = ari, NMI = nmi))
 }
