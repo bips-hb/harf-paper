@@ -73,6 +73,8 @@ harf_synthesizer <- function(data, job, instance, ...) {
       cluster_and_eval(sc_data = synth_single_cell),
       error = function(e) c(ARI = NA_real_, NMI = NA_real_)
     )
+    print(ari_nmi_org)
+    print(ari_nmi_harf)
     ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_harf)
     
     results_list[[i]] <- data.table(
@@ -143,19 +145,39 @@ arf_synthesizer <- function(data, job, instance, ...) {
       parallel = FALSE   
     )
     
+    iter_end <- Sys.time()
     real_train <- as.data.table(instance$data)
     synth_classical_data <- as.data.table(synth_classical_data)
     
     # Compute performance measures
-    UVD <- univariate_distance(
-      real_train = real_train[, ..cols_features],
-      syn = synth_classical_data[, ..cols_features]
+    UVD <- tryCatch(
+      univariate_distance(
+        real_train = real_train[, ..cols_features],
+        syn = synth_classical_data[, ..cols_features]
+      ),
+      error = function(e) NA_real_
     )
     
-    CD <- fastCor_dist_measure(real_train, synth_classical_data)
-    MMD_rbk <- MMD(real_train, synth_classical_data)
+    CD <- tryCatch(
+      fastCor_dist_measure(real_train, synth_classical_data),
+      error = function(e) NA_real_
+    )
+    MMD_rbk <- tryCatch(
+      MMD(real_train, synth_classical_data),
+      error = function(e) NA_real_
+    )
     
-    iter_end <- Sys.time()
+    ari_nmi_org <- tryCatch(
+      cluster_and_eval(sc_data = instance$data),
+      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+    )
+    
+    ari_nmi_arf <- tryCatch(
+      cluster_and_eval(sc_data = synth_classical_data),
+      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+    )
+    ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_arf)
+       
     
     results_list[[i]] <- data.table(
       Data = instance$data_name,
@@ -163,6 +185,8 @@ arf_synthesizer <- function(data, job, instance, ...) {
       UVD = UVD,
       CD = CD,
       MMD_rbk = MMD_rbk,
+      ARI = ari_nmi_diff["ARI"],
+      NMI = ari_nmi_diff["NMI"],
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes
     )
     

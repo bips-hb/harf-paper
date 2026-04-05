@@ -18,7 +18,7 @@ reg <- makeExperimentRegistry(
     file.path(r_code_dir, "00-library-and-setup.R"),
     file.path(perf_dir, "utils.R"),
     file.path(perf_dir, "evaluation_functions.R"),
-    file.path(perf_dir, "cluster-and-avel.R"),
+    file.path(perf_dir, "cluster-and-eval.R")
   ),
   seed = 123
 )
@@ -64,7 +64,7 @@ summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 175)[1, ]
- # testJob(id = id1, reg = reg)
+ testJob(id = id1, reg = reg)
 
 # id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
