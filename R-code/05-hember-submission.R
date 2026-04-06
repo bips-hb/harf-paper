@@ -70,10 +70,10 @@ id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 
 # testJob(id = id2, reg = reg)
 
 ids <- findExperiments()
-ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
+ids <- ids[, chunk := chunk(job.id, chunk.size = 500)]
 submitJobs(reg = reg, ids = ids,
-           resources = list(walltime = "23:50:00",
-                            memory = 1024 * 10,
+           resources = list(walltime = "10:50:00",
+                            memory = 1024 * 15,
                             ncpus = 1,
                             partition = partition,
                             ntasks = 1,
@@ -83,14 +83,16 @@ waitForJobs(reg = reg)
 # ============================
 # Resubmission for failed jobs
 # ============================
-reg <- loadRegistry(file.path(reg_dir, "hember"), writeable = TRUE)
+reg <- loadRegistry(file.dir = file.path(reg_dir, "hember"),
+                    writeable = TRUE,
+                    conf.file = "~/batchtools/batchtools.conf.R")
 ids_expired <- findExpired(reg = reg)
 ids_error <- findErrors(reg = reg)
 ids_failed <- rbind(ids_expired, ids_error)
 if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
   submitJobs(reg = reg, ids = ids_failed, 
-             resources = list(walltime = "23:59:00",
+             resources = list(walltime = "10:59:00",
                               memory = 1024 * 10,
                               ncpus = 1,
                               partition = partition))
