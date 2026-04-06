@@ -68,7 +68,7 @@ harf_synthesizer <- function(data, job, instance, ...) {
       cluster_and_eval(sc_data = instance$data),
       error = function(e) c(ARI = NA_real_, NMI = NA_real_)
     )
-
+    
     ari_nmi_harf <- tryCatch(
       cluster_and_eval(sc_data = synth_single_cell),
       error = function(e) c(ARI = NA_real_, NMI = NA_real_)
@@ -157,16 +157,30 @@ arf_synthesizer <- function(data, job, instance, ...) {
         real_train = real_train[, ..cols_features],
         syn = synth_classical_data[, ..cols_features]
       ),
-      error = function(e) NA_real_
+      error = function(e) {
+        data.table(UVD.metric = NA_real_, 
+                   UVD.metric_info = NA_real_, 
+                   UVD.pair = NA_real_, 
+                   UVD.result = NA_real_)
+      }
     )
     
     CD <- tryCatch(
       fastCor_dist_measure(real_train, synth_classical_data),
-      error = function(e) NA_real_
+      error = function(e) {
+        data.table(CD.metric = NA_real_, 
+                   CD.metric_info = NA_real_, 
+                   CD.pair = NA_real_, 
+                   CD.result = NA_real_)
+      }
     )
     MMD_rbk <- tryCatch(
       MMD(real_train, synth_classical_data),
-      error = function(e) NA_real_
+      error = function(e) {
+        data.table(MMD.metric = NA_real_, 
+                   MMD.metric_info = NA_real_, 
+                   MMD.pair = NA_real_, 
+                   MMD.result = NA_real_)} 
     )
     
     ari_nmi_org <- tryCatch(
@@ -179,7 +193,7 @@ arf_synthesizer <- function(data, job, instance, ...) {
       error = function(e) c(ARI = NA_real_, NMI = NA_real_)
     )
     ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_arf)
-       
+    
     
     results_list[[i]] <- data.table(
       Data = instance$data_name,
@@ -191,8 +205,8 @@ arf_synthesizer <- function(data, job, instance, ...) {
       NMI_ORG = ari_nmi_org["NMI"],
       ARI_ARF = ari_nmi_arf["ARI"],
       NMI_ARF = ari_nmi_arf["NMI"],
-      ARI = ari_nmi_diff["ARI"],
-      NMI = ari_nmi_diff["NMI"],
+      ARI_DIFF = ari_nmi_diff["ARI"],
+      NMI_DIFF = ari_nmi_diff["NMI"],
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes
     )
     

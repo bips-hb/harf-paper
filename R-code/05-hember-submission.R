@@ -52,7 +52,7 @@ pdes <- list(lake = pdes, manno = pdes, li = pdes, patel = pdes)
 ades <- expand.grid(
   num_trees = 10,
   chunck_size = c(25, 50, 75, 100),
-  num_btwn_pcs = c(2, 3, 4, 5)
+  num_btwn_pcs = c(2, 3)
 )
 ades <- list(harf_synthesizer = ades, arf_synthesizer = data.frame(num_trees = 10))
 # 6. Add experiments to registry
@@ -64,7 +64,7 @@ summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 175)[1, ]
- testJob(id = id1, reg = reg)
+ # testJob(id = id1, reg = reg)
 
 # id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
@@ -73,7 +73,7 @@ ids <- findExperiments()
 ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
 submitJobs(reg = reg, ids = ids,
            resources = list(walltime = "23:50:00",
-                            memory = 1024,
+                            memory = 1024 * 10,
                             ncpus = 1,
                             partition = partition,
                             ntasks = 1,
@@ -91,7 +91,7 @@ if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
   submitJobs(reg = reg, ids = ids_failed, 
              resources = list(walltime = "23:59:00",
-                              memory = 1024 * 3,
+                              memory = 1024 * 10,
                               ncpus = 1,
                               partition = partition))
 }
@@ -106,7 +106,7 @@ job_pars_prob <- rbindlist(job_pars$prob.pars, idcol = "job.id", fill = TRUE)
 job_pars_DT <- merge(job_pars_algo, job_pars_prob, by = "job.id")
 # Load and flat results for HARF
 res_harf <- reduceResultsList(ids = ids_done, reg = reg)
-res_harf_DT <- rbindlist(res_harf, idcol = "job.id")
+res_harf_DT <- rbindlist(res_harf, idcol = "job.id", fill = TRUE)
 res_harf_DT$algorithm <- "HARF"
 res_harf_DT <- merge(res_harf_DT, job_pars_DT, by = "job.id")
 saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_hember_results.rds"))
