@@ -8,7 +8,7 @@ source(file.path(r_code_dir, "04-hember-algorithm.R"))
 makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
 partition <- "day-long-cpu"
 
-# unlink(file.path(reg_dir, "hember"), recursive = TRUE)
+unlink(file.path(reg_dir, "hember"), recursive = TRUE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "hember"),
   conf.file = "~/batchtools/batchtools.conf.R",
@@ -70,10 +70,10 @@ id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 
 # testJob(id = id2, reg = reg)
 
 ids <- findExperiments()
-ids <- ids[, chunk := chunk(job.id, chunk.size = 500)]
+ids <- ids[, chunk := chunk(job.id, chunk.size = 400)]
 submitJobs(reg = reg, ids = ids,
            resources = list(walltime = "10:50:00",
-                            memory = 1024 * 40,
+                            memory = 1024 * 3,
                             ncpus = 1,
                             partition = partition,
                             ntasks = 1,

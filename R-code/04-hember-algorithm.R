@@ -8,7 +8,7 @@ harf_synthesizer <- function(data, job, instance, ...) {
   # -------------------------------
   message("Training HARF model for ", instance$data_name, "...")
   # Test with the first 50 features and cell type for faster training
-  # instance$data <- instance$data[, c(1:50, which(colnames(instance$data) == "cell_type"))]
+  instance$data <- instance$data[, c(1:50, which(colnames(instance$data) == "cell_type"))]
   start_time <- Sys.time()
   
   harf_model <- h_arf(
@@ -56,22 +56,40 @@ harf_synthesizer <- function(data, job, instance, ...) {
     
     CD <- tryCatch(
       fastCor_dist_measure(real_train = real_train, syn = synth_single_cell),
-      error = function(e) NA_real_
+      error = function(e) {
+        print(e)
+        data.table(CD.metric = NA_real_, 
+                   CD.metric_info = NA_real_, 
+                   CD.pair = NA_real_, 
+                   CD.result = NA_real_)
+      }
     )
     
     MMD_rbk <- tryCatch(
       MMD(real_train = real_train, syn = synth_single_cell),
-      error = function(e) NA_real_
+      error = function(e) {
+        print(e)
+        data.table(MMD.metric = NA_real_, 
+                   MMD.metric_info = NA_real_, 
+                   MMD.pair = NA_real_, 
+                   MMD.result = NA_real_)
+      }
     )
     
     ari_nmi_org <- tryCatch(
       cluster_and_eval(sc_data = instance$data),
-      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+      error = function(e) {
+        print(e)
+        c(ARI = NA_real_, NMI = NA_real_)
+      }
     )
     
     ari_nmi_harf <- tryCatch(
       cluster_and_eval(sc_data = synth_single_cell),
-      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+      error = function(e) {
+        print(e)
+        c(ARI = NA_real_, NMI = NA_real_)
+      }
     )
     ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_harf)
     
@@ -168,6 +186,7 @@ arf_synthesizer <- function(data, job, instance, ...) {
     CD <- tryCatch(
       fastCor_dist_measure(real_train, synth_classical_data),
       error = function(e) {
+        print(e)
         data.table(CD.metric = NA_real_, 
                    CD.metric_info = NA_real_, 
                    CD.pair = NA_real_, 
@@ -177,6 +196,7 @@ arf_synthesizer <- function(data, job, instance, ...) {
     MMD_rbk <- tryCatch(
       MMD(real_train, synth_classical_data),
       error = function(e) {
+        print(e)
         data.table(MMD.metric = NA_real_, 
                    MMD.metric_info = NA_real_, 
                    MMD.pair = NA_real_, 
@@ -185,12 +205,18 @@ arf_synthesizer <- function(data, job, instance, ...) {
     
     ari_nmi_org <- tryCatch(
       cluster_and_eval(sc_data = instance$data),
-      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+      error = function(e) {
+        print(e)
+        c(ARI = NA_real_, NMI = NA_real_)
+        }
     )
     
     ari_nmi_arf <- tryCatch(
       cluster_and_eval(sc_data = synth_classical_data),
-      error = function(e) c(ARI = NA_real_, NMI = NA_real_)
+      error = function(e) {
+        print(e)
+        c(ARI = NA_real_, NMI = NA_real_)
+        }
     )
     ari_nmi_diff <- abs(ari_nmi_org - ari_nmi_arf)
     
