@@ -8,7 +8,7 @@ harf_synthesizer <- function(data, job, instance, ...) {
   # -------------------------------
   message("Training HARF model for ", instance$data_name, "...")
   # Test with the first 50 features and cell type for faster training
-  instance$data <- instance$data[, c(1:50, which(colnames(instance$data) == "cell_type"))]
+  # instance$data <- instance$data[, c(1:50, which(colnames(instance$data) == "cell_type"))]
   start_time <- Sys.time()
   
   harf_model <- h_arf(
