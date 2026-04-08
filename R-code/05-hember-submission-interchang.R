@@ -42,8 +42,8 @@ addProblem(name = "patel",
            reg = reg)
 
 # 3. Add algorithms to registry
-addAlgorithm(name = "harf_synthesizer", fun = harf_synthesizer_interchangeable, reg = reg)
-addAlgorithm(name = "arf_synthesizer", fun = arf_synthesizer_interchangeable, reg = reg)
+addAlgorithm(name = "harf_synthesizer", fun = harf_interchangeable, reg = reg)
+addAlgorithm(name = "arf_synthesizer", fun = arf_interchangeable, reg = reg)
 
 # 4. Parameter design
 pdes <- data.frame(evidence = c(FALSE, TRUE))

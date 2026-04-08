@@ -22,7 +22,7 @@ create_single_cell_data <- function (
               file_name = data$file_name, 
               data_name = data$data_name,
               evidence = evidence,
-              train_idx = sample(seq_len(nrow(data)), size = floor(0.7 * nrow(data)), replace = FALSE)
+              train_idx = sample(seq_len(nrow(org_dt)), size = floor(0.7 * nrow(org_dt)), replace = FALSE)
               )
          )
 }
