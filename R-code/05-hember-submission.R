@@ -8,7 +8,7 @@ source(file.path(r_code_dir, "04-hember-algorithm.R"))
 makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
 partition <- "day-long-cpu"
 
-unlink(file.path(reg_dir, "hember"), recursive = TRUE)
+# unlink(file.path(reg_dir, "hember"), recursive = TRUE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "hember"),
   conf.file = "~/batchtools/batchtools.conf.R",
@@ -124,6 +124,13 @@ res_arf_DT$chunck_size <- 0
 saveRDS(res_arf_DT, file.path(res_hember_dt_dir, "arf_hember_results.rds"))
 
 # Rbind HARF and ARF results
+# Rename ARI_HARF and ARI_ARF by ARI and NMI_HARF and NMI_ARF by NMI
+res_harf_DT[, `:=`(ARI_SYN = ARI_HARF, NMI_SYN = NMI_HARF)]
+res_arf_DT[, `:=`(ARI_SYN = ARI_ARF, NMI_SYN = NMI_ARF)]
+res_harf_DT$ARI_HARF <- NULL
+res_harf_DT$NMI_HARF <- NULL
+res_arf_DT$ARI_ARF <- NULL
+res_arf_DT$NMI_ARF <- NULL
 res_all_DT <- rbind(res_harf_DT, res_arf_DT)
 saveRDS(res_all_DT, file.path(res_hember_dt_dir,
                               "harf_arf_hember_results.rds"))

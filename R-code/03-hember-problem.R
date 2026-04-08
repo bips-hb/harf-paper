@@ -21,7 +21,8 @@ create_single_cell_data <- function (
   return(list(data = org_dt,
               file_name = data$file_name, 
               data_name = data$data_name,
-              evidence = evidence
+              evidence = evidence,
+              train_idx = sample(seq_len(nrow(data)), size = floor(0.7 * nrow(data)), replace = FALSE)
               )
          )
 }
