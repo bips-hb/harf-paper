@@ -298,7 +298,6 @@ harf_interchangeable <- function(data, job, instance, ...) {
     
     iter_end <- Sys.time()
     real_train <- as.data.table(instance$data[train_idx, ])
-    synth_single_cell <- as.data.frame(synth_single_cell)
     
     # Compute performance measures
     UVD <- tryCatch(
@@ -338,6 +337,7 @@ harf_interchangeable <- function(data, job, instance, ...) {
     # Clustering test data with SC3 to evaluate interchangeability
     test_data <- instance$data[-train_idx, ]
     test_clusters <- cluster_it(test_data)
+    synth_single_cell <- as.data.frame(synth_single_cell)
     
     # Train RF on original training indices
     rf_org <- ranger(
@@ -437,7 +437,6 @@ arf_interchangeable <- function(data, job, instance, ...) {
     
     iter_end <- Sys.time()
     real_train <- as.data.table(instance$data[train_idx, ])
-    synth_classical_data <- as.data.frame(synth_classical_data)
     
     # Compute performance measures
     UVD <- tryCatch(
@@ -446,6 +445,7 @@ arf_interchangeable <- function(data, job, instance, ...) {
         syn = synth_classical_data[, ..cols_features]
       ),
       error = function(e) {
+        print(e)
         data.table(UVD.metric = NA_real_, 
                    UVD.metric_info = NA_real_, 
                    UVD.pair = NA_real_, 
@@ -474,6 +474,7 @@ arf_interchangeable <- function(data, job, instance, ...) {
     )
     
     # Clustering test data with SC3 to evaluate interchangeability
+    synth_classical_data <- as.data.frame(synth_classical_data)
     test_data <- instance$data[-train_idx, ]
     test_clusters <- cluster_it(test_data)
     
