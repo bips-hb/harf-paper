@@ -58,10 +58,10 @@ harf_synthesizer <- function(data, job, instance, ...) {
       fastCor_dist_measure(real_train = real_train, syn = synth_single_cell),
       error = function(e) {
         print(e)
-        data.table(CD.metric = NA_real_, 
-                   CD.metric_info = NA_real_, 
-                   CD.pair = NA_real_, 
-                   CD.result = NA_real_)
+        c(CD.metric = NA_real_, 
+          CD.metric_info = NA_real_, 
+          CD.pair = NA_real_, 
+          CD.result = NA_real_)
       }
     )
     
@@ -69,10 +69,9 @@ harf_synthesizer <- function(data, job, instance, ...) {
       MMD(real_train = real_train, syn = synth_single_cell),
       error = function(e) {
         print(e)
-        data.table(MMD.metric = NA_real_, 
-                   MMD.metric_info = NA_real_, 
-                   MMD.pair = NA_real_, 
-                   MMD.result = NA_real_)
+        c(MMD.metric = NA_real_, 
+          MMD.pair = NA_real_, 
+          MMD.result = NA_real_)
       }
     )
     
@@ -198,7 +197,6 @@ arf_synthesizer <- function(data, job, instance, ...) {
       error = function(e) {
         print(e)
         data.table(MMD.metric = NA_real_, 
-                   MMD.metric_info = NA_real_, 
                    MMD.pair = NA_real_, 
                    MMD.result = NA_real_)} 
     )
@@ -328,7 +326,6 @@ harf_interchangeable <- function(data, job, instance, ...) {
       error = function(e) {
         print(e)
         data.table(MMD.metric = NA_real_, 
-                   MMD.metric_info = NA_real_, 
                    MMD.pair = NA_real_, 
                    MMD.result = NA_real_)} 
     )
@@ -468,7 +465,6 @@ arf_interchangeable <- function(data, job, instance, ...) {
       error = function(e) {
         print(e)
         data.table(MMD.metric = NA_real_, 
-                   MMD.metric_info = NA_real_, 
                    MMD.pair = NA_real_, 
                    MMD.result = NA_real_)} 
     )

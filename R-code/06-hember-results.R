@@ -5,7 +5,7 @@ library(tidyr)
 library(forcats)
 # Local path to the results
 res_hember_DT <- readRDS("R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/hember-lab/harf_arf_hember_results.rds")
-
+res_hember_DT <- readRDS("R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/hember-lab/harf_arf_hember_res_inter.rds")
 # Keep iteration-level data
 dt <- res_hember_DT[, .(
   Data, chunck_size, UVD.result, MMD_rbk.result,
@@ -38,7 +38,7 @@ agg <- agg[ , `:=`(
 
 
 plot_chunk <- function(agg, perf_measure, data_name, n_pcs = 2) {
-  my_plot <- ggplot(agg[Perf_measure == perf_measure & Data == data_name & num_btwn_pcs == n_pcs], aes(x = Data, y = factor(chunck_size), fill = mean_perf)) +
+  my_plot <- ggplot(agg[Perf_measure == perf_measure & Data == data_name & num_btwn_pcs %in% c(NA,2)], aes(x = Data, y = factor(chunck_size), fill = mean_perf)) +
     geom_tile(color = "white") +
     facet_grid(algorithm ~ evidence, scales = "free_y", switch = "x") +
     scale_fill_gradient(low = "#132B43", high = "#56B1F7", name = "Mean Perf") +
@@ -138,7 +138,7 @@ cluster_perf_long[, cluster_metric := ifelse(grepl("ARI", cluster_metric),
 
 cluster_perf_plot <- ggplot(
   cluster_perf_long[
-    num_btwn_pcs == 2 &
+    num_btwn_pcs %in% c(2, NA) &
       evidence == FALSE &
       Data_version == "DIFF"
   ],
@@ -148,13 +148,6 @@ cluster_perf_plot <- ggplot(
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
   facet_grid(cluster_metric ~ Data) +
   theme_bw() +
-  labs(x = "Chunk size", y = "Empirical ARI and NMI") +
-  # Add shaded band for "good" DIFF
-  annotate(
-    "rect",
-    xmin = -Inf, xmax = Inf,
-    ymin = -0.05, ymax = 0.05,
-    alpha = 0.1, fill = "green"
-  ) 
+  labs(x = "Chunk size", y = "Empirical ARI and NMI") 
 
 print(cluster_perf_plot)

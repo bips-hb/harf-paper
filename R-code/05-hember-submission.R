@@ -108,7 +108,11 @@ job_pars_prob <- rbindlist(job_pars$prob.pars, idcol = "job.id", fill = TRUE)
 job_pars_DT <- merge(job_pars_algo, job_pars_prob, by = "job.id")
 # Load and flat results for HARF
 res_harf <- reduceResultsList(ids = ids_done, reg = reg)
-res_harf_DT <- rbindlist(res_harf, idcol = "job.id", fill = TRUE)
+res_harf_DT <- rbindlist(lapply(res_harf, function (res) {
+  #Rename columns with prefix  MMD_rbk.MMD* by MMD_rbk*
+  setnames(res, gsub("MMD_rbk.MMD", "MMD_rbk", names(res)))
+  return(res)
+}), idcol = "job.id", fill = TRUE)
 res_harf_DT$algorithm <- "HARF"
 res_harf_DT <- merge(res_harf_DT, job_pars_DT, by = "job.id")
 saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_hember_results.rds"))
@@ -116,8 +120,17 @@ saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_hember_results.rds"))
 # Load and flat results for ARF
 ids <- findExperiments(algo.name = "arf_synthesizer", reg = reg)
 ids_done <- findDone(ids, reg = reg)
+job_pars <- getJobPars(ids_done, reg = reg)
+job_pars_algo <- rbindlist(job_pars$algo.pars, idcol = "job.id", fill = TRUE)
+job_pars_prob <- rbindlist(job_pars$prob.pars, idcol = "job.id", fill = TRUE)
+job_pars_DT <- merge(job_pars_algo, job_pars_prob, by = "job.id")
 res_arf <- reduceResultsList(ids = ids_done, reg = reg)
 res_arf_DT <- rbindlist(res_arf, idcol = "job.id")
+res_arf_DT <- rbindlist(lapply(res_arf, function (res) {
+  #Rename columns with prefix  MMD_rbk.MMD* by MMD_rbk*
+  setnames(res, gsub("MMD_rbk.MMD", "MMD_rbk", names(res)))
+  return(res)
+}), idcol = "job.id", fill = TRUE)
 res_arf_DT$algorithm <- "ARF"
 res_arf_DT <- merge(res_arf_DT, job_pars_DT, by = "job.id")
 res_arf_DT$chunck_size <- 0
@@ -131,7 +144,7 @@ res_harf_DT$ARI_HARF <- NULL
 res_harf_DT$NMI_HARF <- NULL
 res_arf_DT$ARI_ARF <- NULL
 res_arf_DT$NMI_ARF <- NULL
-res_all_DT <- rbind(res_harf_DT, res_arf_DT)
+res_all_DT <- rbind(res_harf_DT, res_arf_DT, fill = TRUE)
 saveRDS(res_all_DT, file.path(res_hember_dt_dir,
                               "harf_arf_hember_results.rds"))
 
