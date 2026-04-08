@@ -298,7 +298,7 @@ harf_interchangeable <- function(data, job, instance, ...) {
     
     iter_end <- Sys.time()
     real_train <- as.data.table(instance$data[train_idx, ])
-    
+    synth_classical_data <- as.data.table(synth_single_cell)
     # Compute performance measures
     UVD <- tryCatch(
       univariate_distance(
@@ -437,7 +437,7 @@ arf_interchangeable <- function(data, job, instance, ...) {
     
     iter_end <- Sys.time()
     real_train <- as.data.table(instance$data[train_idx, ])
-    
+    synth_classical_data <- as.data.table(synth_classical_data)
     # Compute performance measures
     UVD <- tryCatch(
       univariate_distance(
