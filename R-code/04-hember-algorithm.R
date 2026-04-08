@@ -291,7 +291,7 @@ harf_interchangeable <- function(data, job, instance, ...) {
     synth_single_cell <- h_forge(
       harf_obj = harf_model,
       n_synth = if (instance$evidence) 1 else nrow(instance$data[train_idx, ]),
-      evidence = if (instance$evidence) data.frame(cell_type = instance$data$cell_type[train_idx, ]) else NULL,
+      evidence = if (instance$evidence) data.frame(cell_type = instance$data$cell_type[train_idx]) else NULL,
       parallel = FALSE,   
       verbose = TRUE
     )
