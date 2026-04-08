@@ -299,6 +299,20 @@ harf_interchangeable <- function(data, job, instance, ...) {
     iter_end <- Sys.time()
     synth_single_cell <- as.data.frame(synth_single_cell)
     
+    # Compute performance measures
+    UVD <- tryCatch(
+      univariate_distance(
+        real_train = real_train[, ..cols_features],
+        syn = synth_classical_data[, ..cols_features]
+      ),
+      error = function(e) {
+        data.table(UVD.metric = NA_real_, 
+                   UVD.metric_info = NA_real_, 
+                   UVD.pair = NA_real_, 
+                   UVD.result = NA_real_)
+      }
+    )
+    
     CD <- tryCatch(
       fastCor_dist_measure(real_train, synth_classical_data),
       error = function(e) {
@@ -422,6 +436,20 @@ arf_interchangeable <- function(data, job, instance, ...) {
     
     iter_end <- Sys.time()
     synth_classical_data <- as.data.frame(synth_classical_data)
+    
+    # Compute performance measures
+    UVD <- tryCatch(
+      univariate_distance(
+        real_train = real_train[, ..cols_features],
+        syn = synth_classical_data[, ..cols_features]
+      ),
+      error = function(e) {
+        data.table(UVD.metric = NA_real_, 
+                   UVD.metric_info = NA_real_, 
+                   UVD.pair = NA_real_, 
+                   UVD.result = NA_real_)
+      }
+    )
     
     CD <- tryCatch(
       fastCor_dist_measure(real_train, synth_classical_data),
