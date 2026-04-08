@@ -290,13 +290,14 @@ harf_interchangeable <- function(data, job, instance, ...) {
     
     synth_single_cell <- h_forge(
       harf_obj = harf_model,
-      n_synth = if (instance$evidence) 1 else nrow(instance$data),
-      evidence = if (instance$evidence) data.frame(cell_type = instance$data$cell_type) else NULL,
+      n_synth = if (instance$evidence) 1 else nrow(instance$data[train_idx, ]),
+      evidence = if (instance$evidence) data.frame(cell_type = instance$data$cell_type[train_idx, ]) else NULL,
       parallel = FALSE,   
       verbose = TRUE
     )
     
     iter_end <- Sys.time()
+    real_train <- as.data.table(instance$data[train_idx, ])
     synth_single_cell <- as.data.frame(synth_single_cell)
     
     # Compute performance measures
@@ -435,6 +436,7 @@ arf_interchangeable <- function(data, job, instance, ...) {
     )
     
     iter_end <- Sys.time()
+    real_train <- as.data.table(instance$data[train_idx, ])
     synth_classical_data <- as.data.frame(synth_classical_data)
     
     # Compute performance measures
