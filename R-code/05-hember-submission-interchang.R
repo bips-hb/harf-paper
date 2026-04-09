@@ -51,7 +51,7 @@ pdes <- list(lake = pdes, manno = pdes, li = pdes, patel = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
   num_trees = 10,
-  chunck_size = c(5, 10, 15),
+  chunck_size = c(5, 10, 15, 20, 25),
   num_btwn_pcs = c(2)
 )
 ades <- list(harf_synthesizer = ades, arf_synthesizer = data.frame(num_trees = 10))
@@ -69,11 +69,11 @@ id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 
 # id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
 
-ids <- findExperiments()
-ids <- ids[, chunk := chunk(job.id, chunk.size = 400)]
+ids <- findExperiments(algo.name = "harf_synthesizer", reg = reg)
+ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
 submitJobs(reg = reg, ids = ids,
-           resources = list(walltime = "10:50:00",
-                            memory = 1024 * 3,
+           resources = list(walltime = "4:50:00",
+                            memory = 1024 * 5,
                             ncpus = 1,
                             partition = partition,
                             ntasks = 1,

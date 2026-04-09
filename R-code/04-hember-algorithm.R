@@ -374,11 +374,12 @@ harf_interchangeable <- function(data, job, instance, ...) {
       MMD_rbk = MMD_rbk,
       ARI_ORG = ari_nmi_org["ARI"],
       NMI_ORG = ari_nmi_org["NMI"],
-      ARI_HARF = ari_nmi_syn["ARI"],
-      NMI_HARF = ari_nmi_syn["NMI"],
+      ARI = ari_nmi_syn["ARI"],
+      NMI = ari_nmi_syn["NMI"],
       ARI_DIFF = ari_nmi_diff["ARI"],
       NMI_DIFF = ari_nmi_diff["NMI"],
-      time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes
+      time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes,
+      Synthesizer = "HARF"
     )
     # Clean up memory
     rm(synth_single_cell)
@@ -510,11 +511,12 @@ arf_interchangeable <- function(data, job, instance, ...) {
       MMD_rbk = MMD_rbk,
       ARI_ORG = ari_nmi_org["ARI"],
       NMI_ORG = ari_nmi_org["NMI"],
-      ARI_ARF = ari_nmi_syn["ARI"],
-      NMI_ARF = ari_nmi_syn["NMI"],
+      ARI = ari_nmi_syn["ARI"],
+      NMI = ari_nmi_syn["NMI"],
       ARI_DIFF = ari_nmi_diff["ARI"],
       NMI_DIFF = ari_nmi_diff["NMI"],
-      time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes
+      time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes,
+      Synthesizer = "ARF"
     ))
     rm(synth_classical_data)
     gc()
