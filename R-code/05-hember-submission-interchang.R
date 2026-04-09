@@ -10,7 +10,7 @@ partition <- "day-long-cpu"
 
 unlink(file.path(reg_dir, "hember-interchange2"), recursive = TRUE)
 reg <- makeExperimentRegistry(
-  file.dir = file.path(reg_dir, "hember-interchange"),
+  file.dir = file.path(reg_dir, "hember-interchange2"),
   conf.file = "~/batchtools/batchtools.conf.R",
   packages = character(0L),
   work.dir = "/home/ckuetef/projects/harf-paper/R-code",
@@ -93,7 +93,7 @@ if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
   submitJobs(reg = reg, ids = ids_failed, 
              resources = list(walltime = "10:59:00",
-                              memory = 1024 * 40,
+                              memory = 1024 * 5,
                               ncpus = 1,
                               partition = partition))
 }

@@ -267,6 +267,7 @@ harf_interchangeable <- function(data, job, instance, ...) {
     feature_ordering = colnames(instance$data),
     parallel = FALSE,   
     verbose = TRUE,
+    traget = "cell_type",
     ...
   )
   
