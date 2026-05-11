@@ -73,7 +73,7 @@ ids <- findExperiments(algo.name = "harf_synthesizer", reg = reg)
 ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
 submitJobs(reg = reg, ids = ids,
            resources = list(walltime = "4:50:00",
-                            memory = 1024 * 5,
+                            memory = 1024 * 4,
                             ncpus = 1,
                             partition = partition,
                             ntasks = 1,
@@ -83,7 +83,7 @@ waitForJobs(reg = reg)
 # ============================
 # Resubmission for failed jobs
 # ============================
-reg <- loadRegistry(file.dir = file.path(reg_dir, "hember-interchange"),
+reg <- loadRegistry(file.dir = file.path(reg_dir, "hember-interchange2"),
                     writeable = TRUE,
                     conf.file = "~/batchtools/batchtools.conf.R")
 ids_expired <- findExpired(reg = reg)
