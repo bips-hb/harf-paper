@@ -13,6 +13,7 @@ create_tcga_data <- function (
 ) {
   # Read data.table
   org_dt <- fread(data$file_name, check.names = FALSE)
+  print(colnames(org_dt))
   suppressWarnings({
     org_dt$patientID <- NULL
   })
