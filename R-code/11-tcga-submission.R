@@ -63,7 +63,7 @@ summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "luad", algo.name = "harf_ds_pred"), 175)[1, ]
-# testJob(id = id1, reg = reg)
+testJob(id = id1, reg = reg)
 
 id2 = head(findExperiments(prob.name = "lusc", algo.name = "arf_ds_pred"), 1)
 # testJob(id = id2, reg = reg)

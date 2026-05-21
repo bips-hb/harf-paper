@@ -13,7 +13,9 @@ create_tcga_data <- function (
 ) {
   # Read data.table
   org_dt <- fread(data$file_name, check.names = FALSE)
-  org_dt$patientID <- NULL
+  suppressWarnings({
+    org_dt$patientID <- NULL
+  })
   colnames(org_dt) <- make.names(colnames(org_dt), unique = TRUE)
   char_cols <- names(which(sapply(org_dt, is.character)))
   org_dt[, (char_cols) := lapply(.SD, as.factor), .SDcols = char_cols]
@@ -21,6 +23,14 @@ create_tcga_data <- function (
     if (is.factor(x)) as.integer(x) else x
   )
   org_dt <- as.data.frame(org_dt)
+  # Reduce dataset for 100 variables for testing
+   if (ncol(org_dt) > 100) {
+    set.seed(123)
+    selected_cols <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("patientID",
+                                                                    "years_to_birth",
+                                                                    "tumor_stage")], 100)
+    org_dt <- org_dt[, c(selected_cols, "years_to_birth", "tumor_stage")]
+  }
   # Scale numerical variables
   num_cols <- names(which(sapply(org_dt, is.numeric)))
   org_dt[, num_cols] <- scale(org_dt[, num_cols])
