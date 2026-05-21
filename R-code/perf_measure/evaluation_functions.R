@@ -469,7 +469,6 @@ correlation_distance <- function(syn, real_train, real_test = NULL,
 fastCor_dist_measure <- function (real_train, syn) {
   # char_vars
   char_vars <- names(which(sapply(real_train, is.character)))
-  print(char_vars)
   real_train_num <- real_train[, .SD, .SDcols = -char_vars]
   syn_num <- syn[, .SD, .SDcols = -char_vars]
   real_cor <- HiClimR::fastCor(real_train_num)

@@ -5,10 +5,11 @@ source(file.path(r_code_dir, "03-hember-problem.R"))
 source(file.path(r_code_dir, "04-hember-algorithm.R"))
 
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
-makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
+template <- "~/batchtools/batchtools.slurm.tmpl"
+makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
-unlink(file.path(reg_dir, "hember-interchange2"), recursive = TRUE)
+# unlink(file.path(reg_dir, "hember-interchange2"), recursive = TRUE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "hember-interchange2"),
   conf.file = "~/batchtools/batchtools.conf.R",
@@ -51,7 +52,7 @@ pdes <- list(lake = pdes, manno = pdes, li = pdes, patel = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
   num_trees = 10,
-  chunck_size = c(5, 10, 15, 20, 25),
+  chunck_size = seq(5, 50, by = 5),
   num_btwn_pcs = c(2)
 )
 ades <- list(harf_synthesizer = ades, arf_synthesizer = data.frame(num_trees = 10))
@@ -66,18 +67,18 @@ summarizeExperiments()
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 175)[1, ]
 # testJob(id = id1, reg = reg)
 
-# id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
+id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
 
-ids <- findExperiments(algo.name = "harf_synthesizer", reg = reg)
+ids <- findExperiments(reg = reg)
 ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
 submitJobs(reg = reg, ids = ids,
            resources = list(walltime = "4:50:00",
                             memory = 1024 * 4,
                             ncpus = 1,
-                            partition = partition,
+                            partition = "short-cpu",
                             ntasks = 1,
-                            name = "harf_hember_inter"))
+                            name = "hember_inter"))
 waitForJobs(reg = reg)
 
 # ============================
@@ -88,9 +89,10 @@ reg <- loadRegistry(file.dir = file.path(reg_dir, "hember-interchange2"),
                     conf.file = "~/batchtools/batchtools.conf.R")
 ids_expired <- findExpired(reg = reg)
 ids_error <- findErrors(reg = reg)
-ids_failed <- rbind(ids_expired, ids_error)
+ids_failed <- findNotDone(reg = reg)
 if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
+  ids_failed <- ids_failed[, chunk := chunk(job.id, chunk.size = nrow(ids_failed))]
   submitJobs(reg = reg, ids = ids_failed, 
              resources = list(walltime = "10:59:00",
                               memory = 1024 * 5,
@@ -145,5 +147,4 @@ res_harf_DT$NMI_HARF <- NULL
 res_arf_DT$ARI_ARF <- NULL
 res_arf_DT$NMI_ARF <- NULL
 res_all_DT <- rbind(res_harf_DT, res_arf_DT, fill = TRUE)
-saveRDS(res_all_DT, file.path(res_hember_dt_dir,
-                              "harf_arf_hember_res_inter.rds"))
+saveRDS(res_all_DT, file.path(res_hember_dt_dir, "harf_arf_hember_res_inter.rds"))
