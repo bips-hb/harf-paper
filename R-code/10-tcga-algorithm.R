@@ -2,9 +2,6 @@
 # HARF synthesizer function for downstream (ds) prediction
 # ================================================
 harf_ds_pred <- function(data, job, instance, ...) {
-  # TODO: Move it registry creation part
-  library(glmnet)
-  library(pROC)
   # -------------------------------
   # Train the HARF model (single-threaded)
   # -------------------------------
@@ -33,7 +30,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
   # -------------------------------
   # Prepare for data synthesis
   # -------------------------------
-  cols_features <- setdiff(colnames(instance$data), "tumor_stage")
+  cols_features <- setdiff(colnames(instance$data), c("tumor_stage"))
   n_iter <- 1   # use 100 for full run
   results_list <- vector("list", n_iter)
   
@@ -56,6 +53,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
     real_train <- as.data.table(instance$data[train_idx, ])
     synth_classical_data <- as.data.table(synth_single_cell)
     # Compute performance measures
+    print("I am here...")
     UVD <- tryCatch(
       univariate_distance(
         real_train = real_train[, ..cols_features],
@@ -68,7 +66,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
                    UVD.result = NA_real_)
       }
     )
-    
+    print("I am here 2...")
     CD <- tryCatch(
       fastCor_dist_measure(real_train, synth_classical_data),
       error = function(e) {
@@ -79,6 +77,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
                    CD.result = NA_real_)
       }
     )
+    print("I am here 3...")
     MMD_rbk <- tryCatch(
       MMD(real_train, synth_classical_data),
       error = function(e) {
@@ -101,6 +100,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
       probability = TRUE
     )
     # Train RF on synthetic data
+    synth_single_cell <- as.data.frame(synth_single_cell)
     rf_synth <- ranger(
       x = synth_single_cell[ , -which(colnames(synth_single_cell) == "tumor_stage")],
       y = as.factor(synth_single_cell$tumor_stage),
