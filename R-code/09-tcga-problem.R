@@ -20,7 +20,6 @@ create_tcga_data <- function (
   org_dt[ , ] <- lapply(org_dt, function(x)
     if (is.factor(x)) as.integer(x) else x
   )
-  org_dt$tumor_stage <- tumor_stage
   org_dt <- as.data.frame(org_dt)
   # Scale numerical variables
   num_cols <- names(which(sapply(org_dt, is.numeric)))
