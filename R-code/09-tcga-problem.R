@@ -32,6 +32,13 @@ create_tcga_data <- function (
     org_dt <- org_dt[, c(selected_cols, "years_to_birth", "tumor_stage")]
    }
   print(colnames(org_dt))
+  # Remove continuous variable with 0 variance
+  num_cols <- names(which(sapply(org_dt, is.numeric)))
+  zero_var_cols <- num_cols[sapply(org_dt[, num_cols], function(x) var
+  (x) == 0)]
+  if (length(zero_var_cols) > 0) {
+    org_dt <- org_dt[, !colnames(org_dt) %in% zero_var_cols]
+  }
   # Scale numerical variables
   num_cols <- names(which(sapply(org_dt, is.numeric)))
   org_dt[, num_cols] <- scale(org_dt[, num_cols])
