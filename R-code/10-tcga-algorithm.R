@@ -53,7 +53,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
     real_train <- as.data.table(instance$data[train_idx, ])
     synth_classical_data <- as.data.table(synth_single_cell)
     # Compute performance measures
-    print("I am here...")
+    print("I am here 1...")
     UVD <- tryCatch(
       univariate_distance(
         real_train = real_train[, ..cols_features],
@@ -114,7 +114,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
     # Evaluate AUC for RF
     auc_rf_org <- roc(test_data$tumor_stage, pred_rf_org)$auc
     auc_rf_synth <- roc(test_data$tumor_stage, pred_rf_synth)$auc
-    auc_rf_diff <- auc_org - auc_synth
+    auc_rf_diff <- auc_rf_org - auc_rf_synth
     
     # Train Lasso on original training indices
     x_org_train <- model.matrix(tumor_stage ~ . - 1, data = train_data)
