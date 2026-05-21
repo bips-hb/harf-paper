@@ -13,6 +13,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
   # train_idx <- sample(seq_len(nrow(instance$data)), size = floor(0.7 * nrow(instance$data)), replace = FALSE)
   # instance$data <- instance$data[, c(1:200, which(colnames(instance$data) == "tumor_stage"))]
   instance$data <- as.data.frame(instance$data)
+  instance$data$tumor_stage <- as.factor(instance$data$tumor_stage)
   train_idx <- instance$train_idx
   start_time <- Sys.time()
   harf_model <- h_arf(
