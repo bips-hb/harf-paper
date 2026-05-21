@@ -12,7 +12,7 @@ create_tcga_data <- function (
     evidence = FALSE
 ) {
   # Read data.table
-  org_dt <- as.data.frame(fread(data$file_name, check.names = FALSE))
+  org_dt <- fread(data$file_name, check.names = FALSE)
   org_dt$patientID <- NULL
   colnames(org_dt) <- make.names(colnames(org_dt), unique = TRUE)
   char_cols <- names(which(sapply(org_dt, is.character)))
