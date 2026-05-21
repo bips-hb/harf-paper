@@ -46,7 +46,6 @@ create_tcga_data <- function (
   org_dt$tumor_stage <- factor(org_dt$tumor_stage,
                                levels = c("Early", "Late"))
   n <- nrow(org_dt)
-  print(org_dt[1:10, 1:10])
   return(list(data = org_dt,
               file_name = data$file_name, 
               data_name = data$data_name,
