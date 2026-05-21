@@ -13,7 +13,6 @@ harf_ds_pred <- function(data, job, instance, ...) {
   # train_idx <- sample(seq_len(nrow(instance$data)), size = floor(0.7 * nrow(instance$data)), replace = FALSE)
   # instance$data <- instance$data[, c(1:200, which(colnames(instance$data) == "tumor_stage"))]
   instance$data <- as.data.frame(instance$data)
-  instance$data$tumor_stage <- as.factor(instance$data$tumor_stage)
   train_idx <- instance$train_idx
   start_time <- Sys.time()
   harf_model <- h_arf(
@@ -68,6 +67,15 @@ harf_ds_pred <- function(data, job, instance, ...) {
       }
     )
     print("I am here 2...")
+    # Print variiable names with 0 variance in either real or synthetic data
+    zero_var_real <- names(which(sapply(real_train[, ..cols_features], var) == 0))
+    zero_var_synth <- names(which(sapply(synth_classical_data[, ..cols_features], var) == 0))
+    if (length(zero_var_real) > 0) {
+      message("Variables with zero variance in real data: ", paste(zero_var_real, collapse = ", "))
+    }
+    if (length(zero_var_synth) > 0) {
+      message("Variables with zero variance in synthetic data: ", paste(zero_var_synth, collapse = ", "))
+    }
     CD <- tryCatch(
       fastCor_dist_measure(real_train, synth_classical_data),
       error = function(e) {
