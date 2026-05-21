@@ -121,7 +121,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
     x_org_train <- model.matrix(tumor_stage ~ . - 1,
                                 data = train_data)
     y_org_train <- train_data$tumor_stage  # Keep as factor
-    y_org_train_numeric <- as.numeric(y_train == "Late")  # 1 = Late, 0 = Early
+    y_org_train_numeric <- as.numeric(y_org_train == "Late")  # 1 = Late, 0 = Early
     # Fit Lasso on original data
     lasso_org_model <- cv.glmnet(
       x_org_train,
