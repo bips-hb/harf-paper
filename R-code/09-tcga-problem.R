@@ -26,26 +26,15 @@ create_tcga_data <- function (
   # Reduce dataset for 100 variables for testing
    if (ncol(org_dt) > 100) {
     set.seed(123)
-    selected_cols <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("patientID",
-                                                                    "years_to_birth",
+    selected_cols <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("years_to_birth",
                                                                     "tumor_stage")], 100)
     org_dt <- org_dt[, c(selected_cols, "years_to_birth", "tumor_stage")]
    }
-  print(colnames(org_dt))
-  # Remove continuous variable with 0 variance
-  num_cols <- names(which(sapply(org_dt, is.numeric)))
-  zero_var_cols <- num_cols[sapply(org_dt[, num_cols], function(x) var
-  (x) == 0)]
-  if (length(zero_var_cols) > 0) {
-    message("Removing continuous variables with 0 variance: ", paste(zero_var_cols, collapse = ", "), "\n")
-    org_dt <- org_dt[, !colnames(org_dt) %in% zero_var_cols]
-  }
   # Scale numerical variables
   num_cols <- names(which(sapply(org_dt, is.numeric)))
   org_dt[, num_cols] <- scale(org_dt[, num_cols])
   # Randomly select 10 genes to build an artificial tumor_stage balanced dataset
-  selected_genes <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("patientID",
-                                                                     "years_to_birth",
+  selected_genes <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("years_to_birth",
                                                                      "tumor_stage")], floor(0.005 * ncol(org_dt)))
   # Add age as effect variable to selected genes
   selected_genes <- c(selected_genes, "years_to_birth")
@@ -57,6 +46,7 @@ create_tcga_data <- function (
   org_dt$tumor_stage <- factor(org_dt$tumor_stage,
                                levels = c("Early", "Late"))
   n <- nrow(org_dt)
+  print(org_dt[1:10, 1:10])
   return(list(data = org_dt,
               file_name = data$file_name, 
               data_name = data$data_name,
