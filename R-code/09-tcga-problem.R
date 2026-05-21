@@ -37,6 +37,7 @@ create_tcga_data <- function (
   zero_var_cols <- num_cols[sapply(org_dt[, num_cols], function(x) var
   (x) == 0)]
   if (length(zero_var_cols) > 0) {
+    message("Removing continuous variables with 0 variance: ", paste(zero_var_cols, collapse = ", "), "\n")
     org_dt <- org_dt[, !colnames(org_dt) %in% zero_var_cols]
   }
   # Scale numerical variables
