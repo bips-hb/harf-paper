@@ -13,7 +13,6 @@ create_tcga_data <- function (
 ) {
   # Read data.table
   org_dt <- fread(data$file_name, check.names = FALSE)
-  print(colnames(org_dt))
   suppressWarnings({
     org_dt$patientID <- NULL
   })
@@ -31,7 +30,8 @@ create_tcga_data <- function (
                                                                     "years_to_birth",
                                                                     "tumor_stage")], 100)
     org_dt <- org_dt[, c(selected_cols, "years_to_birth", "tumor_stage")]
-  }
+   }
+  print(colnames(org_dt))
   # Scale numerical variables
   num_cols <- names(which(sapply(org_dt, is.numeric)))
   org_dt[, num_cols] <- scale(org_dt[, num_cols])
