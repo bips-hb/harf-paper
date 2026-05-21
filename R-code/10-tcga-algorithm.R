@@ -88,13 +88,14 @@ harf_ds_pred <- function(data, job, instance, ...) {
     )
     
     
-    # Retrieving testing data
+    # Retrieving training and testing data
+    train_data <- instance$data[train_idx, ]
     test_data <- instance$data[-train_idx, ]
     
     # Train RF on original training indices
     rf_org <- ranger(
-      x = instance$data[train_idx, -which(colnames(instance$data) == "tumor_stage")],
-      y = as.factor(instance$data$tumor_stage[train_idx]),
+      x = train_data[, -which(colnames(train_data) == "tumor_stage")],
+      y = as.factor(train_data$tumor_stage),
       num.trees = 1000, 
       min.node.size = 5,
       probability = TRUE
@@ -117,7 +118,8 @@ harf_ds_pred <- function(data, job, instance, ...) {
     auc_rf_diff <- auc_rf_org - auc_rf_synth
     
     # Train Lasso on original training indices
-    x_org_train <- model.matrix(tumor_stage ~ . - 1, data = train_data)
+    x_org_train <- model.matrix(tumor_stage ~ . - 1,
+                                data = train_data)
     y_org_train <- train_data$tumor_stage  # Keep as factor
     y_org_train_numeric <- as.numeric(y_train == "Late")  # 1 = Late, 0 = Early
     # Fit Lasso on original data
