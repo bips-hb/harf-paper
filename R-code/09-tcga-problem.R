@@ -35,7 +35,7 @@ create_tcga_data <- function (
   org_dt[, num_cols] <- scale(org_dt[, num_cols])
   # Randomly select 10 genes to build an artificial tumor_stage balanced dataset
   selected_genes <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("years_to_birth",
-                                                                     "tumor_stage")], floor(0.005 * ncol(org_dt)))
+                                                                     "tumor_stage")], floor(0.001 * ncol(org_dt)))
   # Add age as effect variable to selected genes
   selected_genes <- c(selected_genes, "years_to_birth")
   beta <- runif(length(selected_genes), -0.01, 0.01)
