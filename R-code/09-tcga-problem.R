@@ -24,12 +24,12 @@ create_tcga_data <- function (
   )
   org_dt <- as.data.frame(org_dt)
   # Reduce dataset for 100 variables for testing
-   if (ncol(org_dt) > 100) {
-    set.seed(123)
-    selected_cols <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("years_to_birth",
-                                                                    "tumor_stage")], 100)
-    org_dt <- org_dt[, c(selected_cols, "years_to_birth", "tumor_stage")]
-   }
+   # if (ncol(org_dt) > 100) {
+   #  set.seed(123)
+   #  selected_cols <- sample(colnames(org_dt)[!colnames(org_dt) %in% c("years_to_birth",
+   #                                                                  "tumor_stage")], 100)
+   #  org_dt <- org_dt[, c(selected_cols, "years_to_birth", "tumor_stage")]
+   # }
   # Scale numerical variables
   num_cols <- names(which(sapply(org_dt, is.numeric)))
   org_dt[, num_cols] <- scale(org_dt[, num_cols])
@@ -38,7 +38,7 @@ create_tcga_data <- function (
                                                                      "tumor_stage")], floor(0.005 * ncol(org_dt)))
   # Add age as effect variable to selected genes
   selected_genes <- c(selected_genes, "years_to_birth")
-  beta <- runif(length(selected_genes), -0.1, 0.1)
+  beta <- runif(length(selected_genes), -0.01, 0.01)
   # Use logistic distribution to create a more realistic two-class problem
   logit <- as.matrix(org_dt[, selected_genes]) %*% beta
   prob <- 1 / (1 + exp(-logit))
