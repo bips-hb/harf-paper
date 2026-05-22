@@ -129,8 +129,9 @@ harf_ds_pred <- function(data, job, instance, ...) {
       family = "binomial"
     )
     # Prepare test set
-    x_test <- model.matrix(tumor_stage ~ . - 1, data = test_data)
+    test_data <- as.data.frame(test_data)
     y_test <- as.numeric(test_data$tumor_stage == "Late")  # 1 = Late, 0 = Early
+    x_test <- model.matrix(tumor_stage ~ . - 1, data = test_data)
     
     # Predict probabilities
     pred_lasso_org <- predict(lasso_org_model, newx = x_test, s = "lambda.min", type = "response")
