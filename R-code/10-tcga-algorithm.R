@@ -291,7 +291,7 @@ arf_ds_pred <- function(data, job, instance, ...) {
     auc_rf_diff <- auc_rf_org - auc_rf_synth
     # Train Lasso on original training indices
     x_org_train <- model.matrix(tumor_stage ~ . - 1, data = instance$data[train_idx, ])
-    y_org_train <- instance$data$tumor_stage[train_idx]$tumor_stage  # Keep as factor
+    y_org_train <- instance$data$tumor_stage[train_idx]  # Keep as factor
     y_org_train_numeric <- as.numeric(y_org_train == "Late")  # 1 = Late, 0 = Early
     # Fit Lasso on original data
     lasso_org_model <- cv.glmnet(
