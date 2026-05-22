@@ -68,7 +68,8 @@ harf_ds_pred <- function(data, job, instance, ...) {
     )
     print("I am here 2...")
     CD <- tryCatch(
-      fastCor_dist_measure(real_train, synth_classical_data),
+      fastCor_dist_measure(real_train[, ..cols_features],
+                           synth_classical_data[, ..cols_features]),
       error = function(e) {
         print(e)
         data.table(CD.metric = NA_real_, 
