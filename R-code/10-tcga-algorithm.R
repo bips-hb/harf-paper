@@ -67,15 +67,6 @@ harf_ds_pred <- function(data, job, instance, ...) {
       }
     )
     print("I am here 2...")
-    # Print variiable names with 0 variance in either real or synthetic data
-    zero_var_real <- names(which(sapply(real_train[, ..cols_features], var) == 0))
-    zero_var_synth <- names(which(sapply(synth_classical_data[, ..cols_features], var) == 0))
-    if (length(zero_var_real) > 0) {
-      message("Variables with zero variance in real data: ", paste(zero_var_real, collapse = ", "))
-    }
-    if (length(zero_var_synth) > 0) {
-      message("Variables with zero variance in synthetic data: ", paste(zero_var_synth, collapse = ", "))
-    }
     CD <- tryCatch(
       fastCor_dist_measure(real_train, synth_classical_data),
       error = function(e) {
@@ -98,13 +89,12 @@ harf_ds_pred <- function(data, job, instance, ...) {
     
     
     # Retrieving training and testing data
-    train_data <- instance$data[train_idx, ]
     test_data <- instance$data[-train_idx, ]
     
     # Train RF on original training indices
     rf_org <- ranger(
-      x = train_data[, -which(colnames(train_data) == "tumor_stage")],
-      y = as.factor(train_data$tumor_stage),
+      x = real_train[, -which(colnames(real_train) == "tumor_stage")],
+      y = as.factor(real_train$tumor_stage),
       num.trees = 1000, 
       min.node.size = 5,
       probability = TRUE
@@ -128,8 +118,8 @@ harf_ds_pred <- function(data, job, instance, ...) {
     
     # Train Lasso on original training indices
     x_org_train <- model.matrix(tumor_stage ~ . - 1,
-                                data = train_data)
-    y_org_train <- train_data$tumor_stage  # Keep as factor
+                                data = real_train)
+    y_org_train <- real_train$tumor_stage  # Keep as factor
     y_org_train_numeric <- as.numeric(y_org_train == "Late")  # 1 = Late, 0 = Early
     # Fit Lasso on original data
     lasso_org_model <- cv.glmnet(
