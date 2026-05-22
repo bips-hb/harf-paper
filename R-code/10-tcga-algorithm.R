@@ -90,7 +90,7 @@ harf_ds_pred <- function(data, job, instance, ...) {
     
     # Retrieving training and testing data
     test_data <- instance$data[-train_idx, ]
-    
+    real_train <- as.data.frame(instance$data[train_idx, ])
     # Train RF on original training indices
     rf_org <- ranger(
       x = real_train[, -which(colnames(real_train) == "tumor_stage")],
