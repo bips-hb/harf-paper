@@ -339,5 +339,6 @@ arf_ds_pred <- function(data, job, instance, ...) {
     rm(synth_classical_data)
     gc()
   }
+  return(rbindlist(results_list))
 }
 
