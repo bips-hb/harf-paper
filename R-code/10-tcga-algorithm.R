@@ -240,7 +240,8 @@ arf_ds_pred <- function(data, job, instance, ...) {
     )
     
     CD <- tryCatch(
-      fastCor_dist_measure(real_train, synth_classical_data),
+      fastCor_dist_measure(real_train[, ..cols_features],
+                           synth_classical_data[, ..cols_features]),
       error = function(e) {
         print(e)
         data.table(CD.metric = NA_real_, 
@@ -250,7 +251,8 @@ arf_ds_pred <- function(data, job, instance, ...) {
       }
     )
     MMD_rbk <- tryCatch(
-      MMD(real_train, synth_classical_data),
+      MMD(real_train[, ..cols_features],
+          synth_classical_data[, ..cols_features]),
       error = function(e) {
         print(e)
         data.table(MMD.metric = NA_real_, 
