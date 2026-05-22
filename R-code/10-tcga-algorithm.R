@@ -225,6 +225,7 @@ arf_ds_pred <- function(data, job, instance, ...) {
     real_train <- as.data.table(instance$data[train_idx, ])
     synth_classical_data <- as.data.table(synth_classical_data)
     # Compute performance measures
+    print("I am here 1...")
     UVD <- tryCatch(
       univariate_distance(
         real_train = real_train[, ..cols_features],
@@ -238,7 +239,7 @@ arf_ds_pred <- function(data, job, instance, ...) {
                    UVD.result = NA_real_)
       }
     )
-    
+    print("I am here 2...")
     CD <- tryCatch(
       fastCor_dist_measure(real_train[, ..cols_features],
                            synth_classical_data[, ..cols_features]),
@@ -250,6 +251,7 @@ arf_ds_pred <- function(data, job, instance, ...) {
                    CD.result = NA_real_)
       }
     )
+    print("I am here 3...")
     MMD_rbk <- tryCatch(
       MMD(real_train[, ..cols_features],
           synth_classical_data[, ..cols_features]),
