@@ -42,7 +42,11 @@ create_tcga_data <- function (
   # Use logistic distribution to create a more realistic two-class problem
   logit <- as.matrix(org_dt[, selected_genes]) %*% beta
   prob <- 1 / (1 + exp(-logit))
-  org_dt$tumor_stage <- ifelse(prob > 0.5, "Late", "Early")
+  org_dt$tumor_stage <- rbinom(nrow(org_dt), 1, prob)
+  org_dt$tumor_stage <- factor(
+    ifelse(org_dt$tumor_stage == 1, "Late", "Early"),
+    levels = c("Early", "Late")
+  )
   org_dt$tumor_stage <- factor(org_dt$tumor_stage,
                                levels = c("Early", "Late"))
   n <- nrow(org_dt)
