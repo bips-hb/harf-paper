@@ -203,7 +203,7 @@ arf_ds_pred <- function(data, job, instance, ...) {
     parallel = FALSE
   )
   
-  training_time_minutes <- as.numeric(difftime(Sys.time(), Sys.time(), units = "mins"))
+  training_time_minutes <- as.numeric(difftime(Sys.time(), start_time, units = "mins"))
   # -------------------------------
   # Prepare for data synthesis
   # -------------------------------
@@ -217,7 +217,7 @@ arf_ds_pred <- function(data, job, instance, ...) {
     synth_classical_data <- forge(
       classical_forde,
       n_synth = if (instance$evidence) 1 else nrow(instance$data[train_idx, ]),
-      evidence = if (instance$evidence) data.frame(tumor_stage = instance$data[train_idx, ]$tumor_stage) else NULL,
+      evidence = if (instance$evidence) data.frame(tumor_stage = instance$data$tumor_stage[train_idx]) else NULL,
       parallel = FALSE   
     )
     
@@ -291,7 +291,7 @@ arf_ds_pred <- function(data, job, instance, ...) {
     auc_rf_diff <- auc_rf_org - auc_rf_synth
     # Train Lasso on original training indices
     x_org_train <- model.matrix(tumor_stage ~ . - 1, data = instance$data[train_idx, ])
-    y_org_train <- instance$data$tumor_stage[train_idx, ]$tumor_stage  # Keep as factor
+    y_org_train <- instance$data$tumor_stage[train_idx]$tumor_stage  # Keep as factor
     y_org_train_numeric <- as.numeric(y_org_train == "Late")  # 1 = Late, 0 = Early
     # Fit Lasso on original data
     lasso_org_model <- cv.glmnet(
