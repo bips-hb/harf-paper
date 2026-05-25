@@ -39,7 +39,7 @@ create_tcga_data <- function (
                            max(10, floor(0.001 * ncol(org_dt))))
   # Add age as effect variable to selected genes
   selected_genes <- c(selected_genes, "years_to_birth")
-  beta <- rnorm(length(selected_genes), 0, 0.01)
+  beta <- rnorm(length(selected_genes), 0, 0.05)
   # Use logistic distribution to create a more realistic two-class problem
   logit <- as.matrix(org_dt[, selected_genes]) %*% beta
   prob <- 1 / (1 + exp(-logit))
