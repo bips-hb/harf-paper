@@ -17,7 +17,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
   start_time <- Sys.time()
   harf_model <- h_arf(
     omx_data = metab_data[train_idx, metab_feats],
-    cli_lab_data = data.frame(Braak_bin3 = metab_data$Braak_bin3[train_idx]),
+    cli_lab_data = metab_data[train_idx, metab_clin_feats],
     feature_ordering = colnames(metab_data),
     parallel = FALSE,   
     verbose = TRUE,
