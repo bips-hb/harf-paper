@@ -280,6 +280,9 @@ ggsave(
   width = 13, height = 10, units = "cm", dpi = 400
 )
 
+# Print the average time 
+print(dt_long_avg[Perf_measure == "Time" & evidence == "No evi.", .(Data, algorithm, mean_perf, sd_perf)])
+
 # Plot runtime foe each dataset
 runtime_plot <- ggplot(
   dt_long_avg[num_btwn_pcs %in% c(2, NA) &

@@ -9,7 +9,7 @@ template <- "~/batchtools/batchtools.slurm.tmpl"
 makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
-# unlink(file.path(reg_dir, "hember-interchange2"), recursive = TRUE)
+# unlink(file.path(reg_dir, "tcga-downstreem-prediction"), recursive = TRUE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "tcga-downstreem-prediction"),
   conf.file = "~/batchtools/batchtools.conf.R",
@@ -63,7 +63,7 @@ summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "luad", algo.name = "harf_ds_pred"), 175)[1, ]
-# testJob(id = id1, reg = reg)
+testJob(id = id1, reg = reg)
 
 id2 = head(findExperiments(prob.name = "lusc", algo.name = "arf_ds_pred"), 1)
 testJob(id = id2, reg = reg)
@@ -82,7 +82,7 @@ waitForJobs(reg = reg)
 # ============================
 # Resubmission for failed jobs
 # ============================
-reg <- loadRegistry(file.dir = file.path(reg_dir, "harf-paper/tcga-downstreem-prediction"),
+reg <- loadRegistry(file.dir = file.path(reg_dir, "tcga-downstreem-prediction"),
                     writeable = TRUE,
                     conf.file = "~/batchtools/batchtools.conf.R")
 ids_expired <- findExpired(reg = reg)
