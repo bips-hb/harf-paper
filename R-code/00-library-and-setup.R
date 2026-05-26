@@ -49,6 +49,10 @@ suppressPackageStartupMessages({
   library(aricode)
   library(doParallel)
   library(batchtools)
+  library(glmnet)
+  library(pROC)
+  library(caret)
+  library(mltools)
 })
 # registerDoParallel(cores = 2)
 
