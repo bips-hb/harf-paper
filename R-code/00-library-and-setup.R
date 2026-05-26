@@ -22,6 +22,10 @@ if (FALSE) {
   install.packages("aricode")
   install.packages("doParallel")
   install.packages("batchtools")
+  install.packages("glmnet")
+  install.packages("pROC")
+  install.packages("caret")
+  install.packages("mltools")
 }
 
 suppressPackageStartupMessages({
