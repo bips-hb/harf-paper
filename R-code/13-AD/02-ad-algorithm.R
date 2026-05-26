@@ -105,7 +105,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
     synth_ad <- as.data.frame(synth_ad)
     rf_synth <- ranger(
       x = synth_ad[ , -which(colnames(synth_ad) == "Braak_bin3")],
-      y = as.factor(synth_single_cell$Braak_bin3),
+      y = as.factor(synth_ad$Braak_bin3),
       num.trees = 5000,
       min.node.size = 5,
       probability = TRUE
@@ -195,7 +195,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
       Synthesizer = "HARF"
     )
     # Clean up memory
-    rm(synth_single_cell)
+    rm(synth_ad)
     gc()
   }
   

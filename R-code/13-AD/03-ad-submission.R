@@ -34,7 +34,7 @@ addAlgorithm(name = "harf_ad_pred", fun = harf_ad_pred, reg = reg)
 addAlgorithm(name = "arf_ad_pred", fun = arf_ad_pred, reg = reg)
 
 # 4. Parameter design
-pdes <- data.frame(evidence = c(FALSE, TRUE))
+pdes <- expand.grid(evidence = c(FALSE, TRUE), prop_synth = c(1.1, 1.2, 1.3, 1.4, 1.5))
 pdes <- list(ad = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
@@ -55,7 +55,7 @@ id1 = head(findExperiments(prob.name = "ad", algo.name = "harf_ad_pred"), 1)[1, 
 testJob(id = id1, reg = reg)
 # 8. Test ARF before submitting to cluster
 id2 = head(findExperiments(prob.name = "ad", algo.name = "arf_ad_pred"), 1)[1, ]
-# testJob(id = id2, reg = reg)
+testJob(id = id2, reg = reg)
 
 ids <- findExperiments(reg = reg)
 ids <- ids[, chunk := chunk(job.id, chunk.size = 500)]
