@@ -14,7 +14,6 @@ create_ad_data <- function (
   # Read data.table
   ad_metab <- fread(data$file_name, check.names = FALSE)
   # Exclude race == 1
-  ad_metab <- ad_metab[ad_metab$race != 1, ]
   ad_metab$race <- NULL
   metab_clin_feats <- c("age_at_death",
                         "sex",
@@ -22,6 +21,8 @@ create_ad_data <- function (
                         "Braak_bin3")
   metab_feats <- grep(pattern = "*Meta*", colnames(ad_metab), value = TRUE)[1:1000]
   train_feats <- c(metab_clin_feats, metab_feats)
+  ad_metab <- ad_metab[, ..train_feats]
+  ad_metab <- ad_metab[complete.cases(ad_metab)]
   train_indices <- caret::createDataPartition(ad_metab$Braak_bin3, p = 0.7, list = FALSE)[ , "Resample1"]
   return(list(data = ad_metab[, ..train_feats],
               metab_clin_feats = metab_clin_feats, 

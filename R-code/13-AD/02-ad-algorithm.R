@@ -7,6 +7,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
   # -------------------------------
   # Split data into training (70%) and testing (30%) sets to assess downstream performance
   metab_data <- as.data.frame(instance$data)
+  metab_data <- metab_data[complete.cases(metab_data), ]
   metab_clin_feats = instance$metab_clin_feats
   metab_feats = instance$metab_feats
   evidence = instance$evidence
