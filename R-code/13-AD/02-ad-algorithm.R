@@ -10,6 +10,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
   metab_clin_feats = instance$metab_clin_feats
   metab_feats = instance$metab_feats
   evidence = instance$evidence
+  print(head(train_idx, n = 30))
   train_idx <- instance$train_idx
   test_idx <- instance$test_idx
   print(dim(metab_data[train_idx, metab_feats]))
