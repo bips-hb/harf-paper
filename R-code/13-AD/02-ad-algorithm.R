@@ -32,7 +32,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
   # Prepare for data synthesis
   # -------------------------------
   # Extract continuous features for performance measures
-  cols_features <- as.data.table(metab_data[, .SD, .SDcols = sapply(metab_data, is.numeric)])
+  cols_features <- as.data.table(metab_data)[, .SD, .SDcols = sapply(metab_data, is.numeric)]
   n_iter <- 1   # use 100 for full run
   results_list <- vector("list", n_iter)
   
