@@ -21,7 +21,7 @@ create_ad_data <- function (
                         "ApoE_bi",
                         "Braak_bin3")
   metab_feats <- grep(pattern = "*Meta*", colnames(ad_metab), value = TRUE)
-  train_indices <- caret::createDataPartition(clin_data$Braak_bin3, p = 0.7, list = FALSE)
+  train_indices <- caret::createDataPartition(ad_metab$Braak_bin3, p = 0.7, list = FALSE)
   return(list(data = ad_metab,
               metab_clin_feats = metab_clin_feats, 
               metab_feats = metab_feats,

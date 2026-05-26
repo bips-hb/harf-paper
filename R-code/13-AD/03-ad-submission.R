@@ -26,7 +26,7 @@ reg <- makeExperimentRegistry(
 
 # 2. Add problems and algorithms to registry
 addProblem(name = "ad", 
-           data = list(file_name = ad_dir, data_names = "ad"), 
+           data = list(file_name = metab_file), 
            fun = create_ad_data,
            reg = reg)
 # 3. Add algorithms to registry
@@ -47,13 +47,12 @@ ades <- list(harf_ad_pred = ades, arf_ad_pred = data.frame(num_trees = 10))
 addExperiments(reg = reg,
                prob.designs = pdes,
                algo.designs = ades,
-               reg.designs = list(seed = c(123, 456, 789)),
                repls = 20)
 summarizeExperiments()
 
 # 7. Test h-ARF before submitting to cluster
 id1 = head(findExperiments(prob.name = "ad", algo.name = "harf_ad_pred"), 1)[1, ]
-# testJob(id = id1, reg = reg)
+testJob(id = id1, reg = reg)
 # 8. Test ARF before submitting to cluster
 id2 = head(findExperiments(prob.name = "ad", algo.name = "arf_ad_pred"), 1)[1, ]
 # testJob(id = id2, reg = reg)
