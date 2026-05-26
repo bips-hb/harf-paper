@@ -12,8 +12,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
   evidence = instance$evidence
   train_idx <- instance$train_idx
   test_idx <- instance$test_idx
-  print(dim(metab_data))
-  print(length(colnames(metab_data)))
+  print(length(metab_clin_feats) + length(metab_feats))
   start_time <- Sys.time()
   harf_model <- h_arf(
     omx_data = metab_data[train_idx, metab_feats],
