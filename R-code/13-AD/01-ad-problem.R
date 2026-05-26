@@ -32,7 +32,7 @@ create_ad_data <- function (
   ad_metab_train[, (metab_feats) := lapply(.SD, scale), .SDcols = metab_feats]
   var_threshold <- quantile(apply(ad_metab_train[, ..metab_feats], 2, var), probs = 0.9)
   selected_metab_feats <- metab_feats[apply(ad_metab_train[, ..metab_feats], 2, var) >= var_threshold]
-  selected_metab_feats <- selected_metab_feats[1:100]
+  selected_metab_feats <- selected_metab_feats
   train_feats <- c(metab_clin_feats, selected_metab_feats)
   # Scale the selected metabolomics features in the test set using the training set parameters
   ad_metab_test <- ad_metab[-train_indices, ..train_feats]
