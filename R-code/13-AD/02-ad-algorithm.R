@@ -6,20 +6,17 @@ harf_ad_pred <- function(data, job, instance, ...) {
   # Train the HARF model 
   # -------------------------------
   # Split data into training (70%) and testing (30%) sets to assess downstream performance
-  metab_data <- as.data.frame(instance$data)
-  metab_data <- metab_data[complete.cases(metab_data), ]
+  train_data <- as.data.frame(instance$train_data)
+  testing_data <- as.data.frame(instance$test_data)
   metab_clin_feats = instance$metab_clin_feats
   metab_feats = instance$metab_feats
   evidence = instance$evidence
-  train_idx <- instance$train_idx
-  print(head(train_idx, n = 30))
-  test_idx <- instance$test_idx
-  print(dim(metab_data[train_idx, metab_feats]))
+  prop_synth <- instance$prop_synth
   start_time <- Sys.time()
   harf_model <- h_arf(
-    omx_data = metab_data[train_idx, metab_feats],
-    cli_lab_data = metab_data[train_idx, metab_clin_feats],
-    feature_ordering = colnames(metab_data),
+    omx_data = train_data[ , metab_feats],
+    cli_lab_data = train_data[ , metab_clin_feats],
+    feature_ordering = colnames(train_data),
     parallel = FALSE,   
     verbose = TRUE,
     target = "Braak_bin3",
@@ -32,7 +29,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
   # Prepare for data synthesis
   # -------------------------------
   # Extract continuous features for performance measures
-  cols_features <- as.data.table(metab_data)[, .SD, .SDcols = sapply(metab_data, is.numeric)]
+  cols_features <- colnames(as.data.table(train_data)[, .SD, .SDcols = sapply(train_data, is.numeric)])
   n_iter <- 1   # use 100 for full run
   results_list <- vector("list", n_iter)
   
@@ -42,18 +39,23 @@ harf_ad_pred <- function(data, job, instance, ...) {
   for (i in 1:n_iter) {
     message("Synthesizing data, iteration ", i, "...")
     iter_start <- Sys.time()
-    
-    synth_single_cell <- h_forge(
+    n_synth <- if (evidence) 1 else floor(nrow(train_data) * prop_synth)
+    evidence_data <- if (evidence) data.frame(Braak_bin3 = sample(
+      x = train_data$Braak_bin3,
+      size = n_synth,
+      replace = TRUE
+    )) else NULL
+    synth_ad <- h_forge(
       harf_obj = harf_model,
-      n_synth = if (evidence) 1 else nrow(metab_data[train_idx, ]),
-      evidence = if (evidence) data.frame(Braak_bin3 = metab_data$Braak_bin3[train_idx]) else NULL,
+      n_synth = if (evidence) 1 else floor(nrow(train_data) * prop_synth),
+      evidence = if (evidence) evidence_data else NULL,
       parallel = FALSE,   
       verbose = TRUE
     )
     
     iter_end <- Sys.time()
-    real_train <- as.data.table(metab_data[train_idx, ])
-    synth_classical_data <- as.data.table(synth_single_cell)
+    real_train <- as.data.table(train_data)
+    synth_classical_data <- as.data.table(synth_ad)
     # Compute performance measures
     UVD <- tryCatch(
       univariate_distance(
@@ -89,28 +91,28 @@ harf_ad_pred <- function(data, job, instance, ...) {
     
     
     # Retrieving training and testing data
-    test_data <- metab_data[-train_idx, ]
-    real_train <- as.data.frame(metab_data[train_idx, ])
+    test_data <- testing_data
+    real_train <- as.data.frame(train_data)
     # Train RF on original training indices
     rf_org <- ranger(
       x = real_train[, -which(colnames(real_train) == "Braak_bin3")],
       y = as.factor(real_train$Braak_bin3),
-      num.trees = 1000, 
+      num.trees = 5000, 
       min.node.size = 5,
       probability = TRUE
     )
     # Train RF on synthetic data
-    synth_single_cell <- as.data.frame(synth_single_cell)
+    synth_ad <- as.data.frame(synth_ad)
     rf_synth <- ranger(
-      x = synth_single_cell[ , -which(colnames(synth_single_cell) == "Braak_bin3")],
+      x = synth_ad[ , -which(colnames(synth_ad) == "Braak_bin3")],
       y = as.factor(synth_single_cell$Braak_bin3),
       num.trees = 5000,
       min.node.size = 5,
       probability = TRUE
     )
     # Predict on test data using both models
-    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 1]
-    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 1]
+    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
+    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
     # Evaluate AUC for RF
     roc_rf_org <- roc(test_data$Braak_bin3, pred_rf_org)
     auc_rf_org <- roc_rf_org$auc
@@ -119,9 +121,9 @@ harf_ad_pred <- function(data, job, instance, ...) {
     auc_rf_diff <- auc_rf_org - auc_rf_synth
     # Compute MCC for RF
     threshold_rf <- coords(roc_rf_synth, "best", ret = "threshold")
-    mcc_rf_org <- mltools::mcc(preds = ifelse(pred_rf_org > threshold_rf$threshold, 1, 0),
+    mcc_rf_org <- mltools::mcc(preds = ifelse(pred_rf_org > threshold_rf$threhold, 1, 0),
                                actuals = test_data$Braak_bin3)
-    mcc_rf_synth <- mltools::mcc(preds = ifelse(pred_rf_synth > threshold_rf$threshold, 1, 0),
+    mcc_rf_synth <- mltools::mcc(preds = ifelse(pred_rf_synth > threshold_rf$threhold, 1, 0),
                                  actuals = test_data$Braak_bin3)
     mcc_rf_diff <- mcc_rf_org - mcc_rf_synth
     
@@ -129,34 +131,32 @@ harf_ad_pred <- function(data, job, instance, ...) {
     x_org_train <- model.matrix(Braak_bin3 ~ . - 1,
                                 data = real_train)
     y_org_train <- real_train$Braak_bin3  # Keep as factor
-    y_org_train_numeric <- as.numeric(y_org_train == "Late")  # 1 = Late, 0 = Early
     # Fit Lasso on original data
     lasso_org_model <- cv.glmnet(
       x_org_train,
-      y_org_train_numeric,
+      y_org_train,
       alpha = 1,
       family = "binomial"
     )
     # Prepare test set
     test_data <- as.data.frame(test_data)
-    y_test <- as.numeric(test_data$Braak_bin3 == "Late")  # 1 = Late, 0 = Early
     x_test <- model.matrix(Braak_bin3 ~ . - 1, data = test_data)
     
     # Predict probabilities
     pred_lasso_org <- predict(lasso_org_model, newx = x_test, s = "lambda.min", type = "response")
     
     # Compute AUC
-    roc_lasso_org <- roc(y_test, as.vector(pred_lasso_org))
+    roc_lasso_org <- roc(test_data$Braak_bin3, as.vector(pred_lasso_org))
     auc_lasso_org <- roc_lasso_org$auc
     
     # Compute Matthews Correlation Coefficient (MCC) for Lasso
-    threshold_lasso <- coords(lasso_auc , "best", ret = "threshold")
+    threshold_lasso <- coords(roc_lasso_org , "best", ret = "threshold")
     mcc_lasso_org <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_org) > threshold_lasso$threshold, 1, 0),
                                   actuals = test_data$Braak_bin3)
     
     # Fit lasso on synthetic data
-    x_synth_train <- model.matrix(Braak_bin3 ~ . - 1, data = synth_single_cell)
-    y_synth_train <- as.numeric(synth_single_cell$Braak_bin3 == "Late")  # 1 = Late, 0 = Early
+    x_synth_train <- model.matrix(Braak_bin3 ~ . - 1, data = test_data)
+    y_synth_train <- test_data$Braak_bin3
     lasso_synth_model <- cv.glmnet(
       x_synth_train,
       y_synth_train,
@@ -165,7 +165,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
     # Predict probabilities on test set
     pred_lasso_synth <- predict(lasso_synth_model, newx = x_test, s = "lambda.min", type = "response")
     # Compute AUC
-    roc_lasso_synth <- roc(y_test, as.vector(pred_lasso_synth))
+    roc_lasso_synth <- roc(test_data$Braak_bin3, as.vector(pred_lasso_synth))
     auc_lasso_synth <- roc_lasso_synth$auc
     # Compute MCC for Lasso on synthetic data
     threshold_lasso_synth <- coords(roc_lasso_synth , "best", ret = "threshold")
@@ -189,6 +189,8 @@ harf_ad_pred <- function(data, job, instance, ...) {
       MCC_RF_SYN = mcc_rf_synth,
       MCC_RF_DIFF = mcc_rf_diff,
       MCC_Lasso_ORG = mcc_lasso_org,
+      MCC_Lasso_SYN = mcc_lasso_synth,
+      MCC_Lasso_DIFF = mcc_lasso_diff,
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes,
       Synthesizer = "HARF"
     )
@@ -208,16 +210,16 @@ arf_ad_pred <- function(data, job, instance, ...) {
   # --------------------------------------
   # Train the ARF model (single-threaded)
   # --------------------------------------
-  metab_data <- as.data.frame(instance$data)
+  train_data <- as.data.frame(instance$train_data)
+  testing_data <- as.data.frame(instance$test_data)
   metab_clin_feats = instance$metab_clin_feats
   metab_feats = instance$metab_feats
   evidence = instance$evidence
-  train_idx <- instance$train_idx
-  test_idx <- instance$test_idx
+  prop_synth <- instance$prop_synth
   start_time <- Sys.time()
   
   classical_arf <- adversarial_rf(
-    x = metab_data[train_idx, ],
+    x = train_data,
     prune = TRUE,
     delta = 0,
     verbose = TRUE,
@@ -227,7 +229,7 @@ arf_ad_pred <- function(data, job, instance, ...) {
   
   classical_forde <- forde(
     classical_arf,
-    metab_data[train_idx, ],
+    train_data,
     parallel = FALSE
   )
   
@@ -235,22 +237,27 @@ arf_ad_pred <- function(data, job, instance, ...) {
   # -------------------------------
   # Prepare for data synthesis
   # -------------------------------
-  cols_features <- metab_data[, .SD, .SDcols = sapply(metab_data, is.numeric)]
+  cols_features <- colnames(as.data.table(train_data)[, .SD, .SDcols = sapply(train_data, is.numeric)])
   n_iter <- 1  # change to 100 for full run
   results_list <- vector("list", n_iter)
   for (i in 1:n_iter) {
     message("Synthesizing data, iteration ", i, "...")
     iter_start <- Sys.time()
-    
+    n_synth <- if (evidence) 1 else floor(nrow(train_data) * prop_synth)
+    evidence_data <- if (evidence) data.frame(Braak_bin3 = sample(
+      x = train_data$Braak_bin3,
+      size = n_synth,
+      replace = TRUE
+    )) else NULL
     synth_classical_data <- forge(
       classical_forde,
-      n_synth = if (evidence) 1 else nrow(metab_data[train_idx, ]),
-      evidence = if (evidence) data.frame(Braak_bin3 = metab_data$Braak_bin3[train_idx]) else NULL,
+      n_synth = if (evidence) 1 else nrow(train_data),
+      evidence = if (evidence) evidence_data else NULL,
       parallel = FALSE   
     )
     
     iter_end <- Sys.time()
-    real_train <- as.data.table(metab_data[train_idx, ])
+    real_train <- as.data.table(train_data)
     synth_classical_data <- as.data.table(synth_classical_data)
     # Compute performance measures
     UVD <- tryCatch(
@@ -289,12 +296,12 @@ arf_ad_pred <- function(data, job, instance, ...) {
     
     # Retrieving testing data and clusters
     synth_classical_data <- as.data.frame(synth_classical_data)
-    test_data <- metab_data[-train_idx, ]
+    test_data <- as.data.frame(testing_data)
     
     # Train RF on original training indices
     rf_org <- ranger(
-      x = metab_data[train_idx, -which(colnames(metab_data) == "Braak_bin3")],
-      y = as.factor(metab_data$Braak_bin3[train_idx]),
+      x = train_data[, -which(colnames(train_data) == "Braak_bin3")],
+      y = as.factor(train_data$Braak_bin3),
       num.trees = 5000,
       min.node.size = 5,
       probability = TRUE
@@ -308,8 +315,8 @@ arf_ad_pred <- function(data, job, instance, ...) {
       probability = TRUE
     )
     # Predict on test data using both models
-    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 1]
-    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 1]
+    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
+    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
     # Evaluate AUC for RF
     roc_rf_org <- roc(test_data$Braak_bin3, pred_rf_org)
     auc_rf_org <- roc_rf_org$auc
@@ -325,26 +332,25 @@ arf_ad_pred <- function(data, job, instance, ...) {
     mcc_rf_diff <- mcc_rf_org - mcc_rf_synth
     
     # Train Lasso on original training indices
-    x_org_train <- model.matrix(Braak_bin3 ~ . - 1, data = metab_data[train_idx, ])
-    y_org_train <- metab_data$Braak_bin3[train_idx]  # Keep as factor
-    y_org_train_numeric <- as.numeric(y_org_train == "Late")  # 1 = Late, 0 = Early
+    x_org_train <- model.matrix(Braak_bin3 ~ . - 1, data = train_data)
+    y_org_train <- train_data$Braak_bin3  
     # Fit Lasso on original data
     lasso_org_model <- cv.glmnet(
       x_org_train,
-      y_org_train_numeric,
+      y_org_train,
       alpha = 1,
       family = "binomial"
     )
     # Prepare test set
     x_test <- model.matrix(Braak_bin3 ~ . - 1, data = test_data)
-    y_test <- as.numeric(test_data$Braak_bin3 == "Late")  # 1 = Late, 0 = Early
+    y_test <- test_data$Braak_bin3  
     # Predict probabilities
     pred_lasso_org <- predict(lasso_org_model, newx = x_test, s = "lambda.min", type = "response")
     roc_lasso_org <- roc(y_test, as.vector(pred_lasso_org))
     auc_lasso_org <- roc_lasso_org$auc
     # Fit lasso on synthetic data
     x_synth_train <- model.matrix(Braak_bin3 ~ . - 1, data = synth_classical_data)
-    y_synth_train <- as.numeric(synth_classical_data$Braak_bin3 == "Late")  # 1 = Late, 0 = Early
+    y_synth_train <- synth_classical_data$Braak_bin3
     lasso_synth_model <- cv.glmnet(
       x_synth_train,
       y_synth_train,
