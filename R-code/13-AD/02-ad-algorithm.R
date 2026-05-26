@@ -176,6 +176,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
     results_list[[i]] <- data.table(
       Data = instance$data_name,
       iteration = i,
+      evidence = evidence,
       UVD = UVD,
       CD = CD,
       MMD_rbk = MMD_rbk,
@@ -373,6 +374,7 @@ arf_ad_pred <- function(data, job, instance, ...) {
     results_list[[i]] <- data.table(
       Data = instance$data_name,
       iteration = i,
+      evidence = evidence,
       UVD = UVD,
       CD = CD,
       MMD_rbk = MMD_rbk,
