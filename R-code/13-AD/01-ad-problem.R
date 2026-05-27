@@ -28,7 +28,7 @@ create_ad_data <- function(data, job, evidence = FALSE, prop_synth = 1) {
   # FEATURE SELECTION
   # -----------------------
   feat_var <- apply(train[, ..metab_feats], 2, var, na.rm = TRUE)
-  variance_threshold <- quantile(feat_var, 0.9, na.rm = TRUE)
+  variance_threshold <- quantile(feat_var, 0.7, na.rm = TRUE)
   # Choose only 100 for testing, but in practice we can use all above the threshold
   # selected_metab_feats <- names(sort(feat_var, decreasing = TRUE))[1:100]
   selected_metab_feats <- names(feat_var[feat_var >= variance_threshold])
