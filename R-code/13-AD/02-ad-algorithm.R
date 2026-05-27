@@ -13,8 +13,8 @@ harf_ad_pred <- function(data, job, instance, ...) {
   evidence = instance$evidence
   prop_synth <- instance$prop_synth
   # Set penalty factors for Lasso to avoid shrinking ApoE_bi
-  pf <- rep(1, ncol(x_org_train))
-  names(pf) <- colnames(x_org_train)
+  pf <- rep(1, ncol(train_data))[-which(colnames(train_data) == "Braak_bin3")]  # Exclude target variable
+  names(pf) <- colnames(train_data)[colnames(train_data) != "Braak_bin3"]
   pf["ApoE_bi"] <- 0   # no shrinkage
   start_time <- Sys.time()
   harf_model <- h_arf(
@@ -226,8 +226,8 @@ arf_ad_pred <- function(data, job, instance, ...) {
   evidence = instance$evidence
   prop_synth <- instance$prop_synth
   # Set penalty factors for Lasso to avoid shrinking ApoE_bi
-  pf <- rep(1, ncol(x_org_train))
-  names(pf) <- colnames(x_org_train)
+  pf <- rep(1, ncol(train_data) - 1)  # Exclude target variable
+  names(pf) <- colnames(train_data)[colnames(train_data) != "Braak_bin3"]
   pf["ApoE_bi"] <- 0   # no shrinkage
   start_time <- Sys.time()
   
