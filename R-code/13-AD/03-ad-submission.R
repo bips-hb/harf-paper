@@ -52,7 +52,7 @@ summarizeExperiments()
 
 # 7. Test h-ARF before submitting to cluster
 id1 = head(findExperiments(prob.name = "ad", algo.name = "harf_ad_pred"), 1)[1, ]
-# testJob(id = id1, reg = reg)
+testJob(id = id1, reg = reg)
 # 8. Test ARF before submitting to cluster
 id2 = head(findExperiments(prob.name = "ad", algo.name = "arf_ad_pred"), 1)[1, ]
 # testJob(id = id2, reg = reg)
