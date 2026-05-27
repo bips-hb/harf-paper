@@ -39,7 +39,7 @@ pdes <- list(ad = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
   num_trees = 10,
-  chunck_size = seq(5, 50, by = 5),
+  chunck_size = seq(50, 50, by = 5),
   num_btwn_pcs = c(2)
 )
 ades <- list(harf_ad_pred = ades, arf_ad_pred = data.frame(num_trees = 10))
@@ -55,7 +55,7 @@ id1 = head(findExperiments(prob.name = "ad", algo.name = "harf_ad_pred"), 1)[1, 
 testJob(id = id1, reg = reg)
 # 8. Test ARF before submitting to cluster
 id2 = head(findExperiments(prob.name = "ad", algo.name = "arf_ad_pred"), 1)[1, ]
-# testJob(id = id2, reg = reg)
+testJob(id = id2, reg = reg)
 
 ids <- findExperiments(reg = reg)
 ids <- ids[, chunk := chunk(job.id, chunk.size = 500)]

@@ -6,44 +6,59 @@
 #'
 #' @returns A data.frame containing the original data, which will be used as the problem for Batchexperiment.
 #'
-create_ad_data <- function (
-    data,
-    job,
-    evidence = FALSE,
-    prop_synth = 1
-) {
-  # Read data.table
-  ad_metab <- fread(data$file_name, check.names = FALSE)
-  # Exclude race == 1
-  ad_metab$race <- NULL
-  metab_clin_feats <- c("age_at_death",
-                        "sex",
-                        "ApoE_bi",
-                        "Braak_bin3")
-  metab_feats <- grep(pattern = "*Meta*", colnames(ad_metab), value = TRUE)
-  # Also scale age
-  ad_metab[, age_at_death := scale(age_at_death)]
-  train_feats <- c(metab_clin_feats, metab_feats)
-  ad_metab <- ad_metab[, ..train_feats]
-  ad_metab <- ad_metab[complete.cases(ad_metab)]
-  train_indices <- caret::createDataPartition(ad_metab$Braak_bin3, p = 0.7, list = FALSE)[ , "Resample1"]
-  # Scale metabolomics features and choose the 10% top variable features based on training data
-  ad_metab_train <- ad_metab[train_indices, ]
-  ad_metab_train[, (metab_feats) := lapply(.SD, scale), .SDcols = metab_feats]
-  var_threshold <- quantile(apply(ad_metab_train[, ..metab_feats], 2, var), probs = 0.9)
-  selected_metab_feats <- metab_feats[apply(ad_metab_train[, ..metab_feats], 2, var) >= var_threshold]
-  selected_metab_feats <- selected_metab_feats[1:100]
-  train_feats <- c(metab_clin_feats, selected_metab_feats)
-  # Scale the selected metabolomics features in the test set using the training set parameters
-  ad_metab_test <- ad_metab[-train_indices, ..train_feats]
-  # ad_metab_test[, (selected_metab_feats) := lapply(.SD, scale), .SDcols = selected_metab_feats]
+create_ad_data <- function(data, job, evidence = FALSE, prop_synth = 1) {
   
-  return(list(train_data = ad_metab[, ..train_feats],
-              test_data = ad_metab_test[, ..train_feats],
-              metab_clin_feats = metab_clin_feats, 
-              metab_feats = selected_metab_feats,
-              evidence = evidence,
-              prop_synth = prop_synth,
-              test_idx = setdiff(seq_len(nrow(ad_metab_train)), train_indices)
-  ))
+  ad_metab <- data.table::fread(data$file_name, check.names = FALSE)
+  ad_metab$race <- NULL
+  ad_metab$ApoE_bi <- ifelse(ad_metab$ApoE_bi == 2, 1L, 0L)
+  metab_clin_feats <- c("age_at_death", "sex", "ApoE_bi", "Braak_bin3")
+  metab_feats <- grep("*Meta*", colnames(ad_metab), value = TRUE)
+  
+  ad_metab <- ad_metab[, c(metab_clin_feats, metab_feats), with = FALSE]
+  ad_metab <- ad_metab[complete.cases(ad_metab)]
+  
+  ad_metab$Braak_bin3 <- factor(ad_metab$Braak_bin3, levels = c(0, 1))
+  
+  train_idx <- caret::createDataPartition(ad_metab$Braak_bin3, p = 0.7, list = FALSE)[,1]
+  
+  train <- ad_metab[train_idx]
+  test  <- ad_metab[-train_idx]
+  
+  # -----------------------
+  # FEATURE SELECTION
+  # -----------------------
+  feat_var <- apply(train[, ..metab_feats], 2, var, na.rm = TRUE)
+  
+  selected_metab_feats <- names(sort(feat_var, decreasing = TRUE))[1:100]
+  train_feats <- c(metab_clin_feats, selected_metab_feats)
+  
+  # NOW SUBSET CONSISTENTLY
+  train <- train[, ..train_feats]
+  test  <- test[, ..train_feats]
+  
+  # -----------------------
+  # SAFE SCALING
+  # -----------------------
+  means <- sapply(train[, ..selected_metab_feats], mean)
+  sds   <- sapply(train[, ..selected_metab_feats], sd)
+  
+  for (f in selected_metab_feats) {
+    train[[f]] <- (train[[f]] - means[[f]]) / sds[[f]]
+    test[[f]]  <- (test[[f]]  - means[[f]]) / sds[[f]]
+  }
+  
+  age_mean <- mean(train$age_at_death)
+  age_sd   <- sd(train$age_at_death)
+  
+  train[, age_at_death := (age_at_death - age_mean) / age_sd]
+  test[, age_at_death := (age_at_death - age_mean) / age_sd]
+  
+  list(
+    train_data = train,
+    test_data  = test,
+    metab_clin_feats = metab_clin_feats,
+    metab_feats = selected_metab_feats,
+    evidence = evidence,
+    prop_synth = prop_synth
+  )
 }

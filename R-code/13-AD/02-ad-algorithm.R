@@ -7,11 +7,15 @@ harf_ad_pred <- function(data, job, instance, ...) {
   # -------------------------------
   # Split data into training (70%) and testing (30%) sets to assess downstream performance
   train_data <- as.data.frame(instance$train_data)
-  testing_data <- as.data.frame(instance$test_data)
+  test_data <- as.data.frame(instance$test_data)
   metab_clin_feats = instance$metab_clin_feats
   metab_feats = instance$metab_feats
   evidence = instance$evidence
   prop_synth <- instance$prop_synth
+  # Set penalty factors for Lasso to avoid shrinking ApoE_bi
+  pf <- rep(1, ncol(x_org_train))
+  names(pf) <- colnames(x_org_train)
+  pf["ApoE_bi"] <- 0   # no shrinkage
   start_time <- Sys.time()
   harf_model <- h_arf(
     omx_data = train_data[ , metab_feats],
@@ -91,7 +95,6 @@ harf_ad_pred <- function(data, job, instance, ...) {
     
     
     # Retrieving training and testing data
-    test_data <- testing_data
     real_train <- as.data.frame(train_data)
     # Train RF on original training indices
     rf_org <- ranger(
@@ -111,8 +114,8 @@ harf_ad_pred <- function(data, job, instance, ...) {
       probability = TRUE
     )
     # Predict on test data using both models
-    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
-    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
+    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , "1"]
+    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , "1"]
     # Evaluate AUC for RF
     roc_rf_org <- roc(test_data$Braak_bin3, pred_rf_org)
     auc_rf_org <- roc_rf_org$auc
@@ -120,11 +123,12 @@ harf_ad_pred <- function(data, job, instance, ...) {
     auc_rf_synth <- roc_rf_synth$auc
     auc_rf_diff <- auc_rf_org - auc_rf_synth
     # Compute MCC for RF
-    threshold_rf <- coords(roc_rf_synth, "best", ret = "threshold")
-    mcc_rf_org <- mltools::mcc(preds = ifelse(pred_rf_org > threshold_rf$threhold, 1, 0),
-                               actuals = test_data$Braak_bin3)
-    mcc_rf_synth <- mltools::mcc(preds = ifelse(pred_rf_synth > threshold_rf$threhold, 1, 0),
-                                 actuals = test_data$Braak_bin3)
+    org_threshold_rf <- coords(roc_rf_org, "best", ret = "threshold")$threshold
+    syn_threshold_rf <- coords(roc_rf_synth, "best", ret = "threshold")$threshold
+    mcc_rf_org <- mltools::mcc(preds = ifelse(pred_rf_org > org_threshold_rf, 1, 0),
+                               actuals = as.integer(as.vector(test_data$Braak_bin3)))
+    mcc_rf_synth <- mltools::mcc(preds = ifelse(pred_rf_synth > syn_threshold_rf, 1, 0),
+                                 actuals = as.integer(as.vector(test_data$Braak_bin3)))
     mcc_rf_diff <- mcc_rf_org - mcc_rf_synth
     
     # Train Lasso on original training indices
@@ -136,7 +140,8 @@ harf_ad_pred <- function(data, job, instance, ...) {
       x_org_train,
       y_org_train,
       alpha = 1,
-      family = "binomial"
+      family = "binomial",
+      penalty.factor = pf
     )
     # Prepare test set
     test_data <- as.data.frame(test_data)
@@ -150,27 +155,28 @@ harf_ad_pred <- function(data, job, instance, ...) {
     auc_lasso_org <- roc_lasso_org$auc
     
     # Compute Matthews Correlation Coefficient (MCC) for Lasso
-    threshold_lasso <- coords(roc_lasso_org , "best", ret = "threshold")
-    mcc_lasso_org <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_org) > threshold_lasso$threshold, 1, 0),
-                                  actuals = test_data$Braak_bin3)
+    threshold_lasso <- coords(roc_lasso_org , "best", ret = "threshold")$threshold
+    mcc_lasso_org <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_org) > threshold_lasso, 1, 0),
+                                  actuals = as.numeric(as.vector(test_data$Braak_bin3)))
     
     # Fit lasso on synthetic data
-    x_synth_train <- model.matrix(Braak_bin3 ~ . - 1, data = test_data)
-    y_synth_train <- test_data$Braak_bin3
+    x_synth_train <- model.matrix(Braak_bin3 ~ . - 1, data = synth_ad)
+    y_synth_train <- synth_ad$Braak_bin3
     lasso_synth_model <- cv.glmnet(
       x_synth_train,
       y_synth_train,
       alpha = 1,
-      family = "binomial")
+      family = "binomial",
+      penalty.factor = pf)
     # Predict probabilities on test set
     pred_lasso_synth <- predict(lasso_synth_model, newx = x_test, s = "lambda.min", type = "response")
     # Compute AUC
     roc_lasso_synth <- roc(test_data$Braak_bin3, as.vector(pred_lasso_synth))
     auc_lasso_synth <- roc_lasso_synth$auc
     # Compute MCC for Lasso on synthetic data
-    threshold_lasso_synth <- coords(roc_lasso_synth , "best", ret = "threshold")
-    mcc_lasso_synth <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_synth) > threshold_lasso_synth$threshold, 1, 0),
-                                    actuals = test_data$Braak_bin3)
+    threshold_lasso_synth <- coords(roc_lasso_synth , "best", ret = "threshold")$threshold
+    mcc_lasso_synth <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_synth) > threshold_lasso_synth, 1, 0),
+                                    actuals = as.numeric(as.vector(test_data$Braak_bin3)))
     mcc_lasso_diff <- mcc_lasso_org - mcc_lasso_synth
     
     results_list[[i]] <- data.table(
@@ -192,6 +198,8 @@ harf_ad_pred <- function(data, job, instance, ...) {
       MCC_Lasso_ORG = mcc_lasso_org,
       MCC_Lasso_SYN = mcc_lasso_synth,
       MCC_Lasso_DIFF = mcc_lasso_diff,
+      ApoE_ORG = coef(lasso_org_model, s = "lambda.min")["ApoE_bi", 1],
+      ApoE_SYN = coef(lasso_synth_model, s = "lambda.min")["ApoE_bi", 1],
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes,
       Synthesizer = "HARF"
     )
@@ -212,11 +220,15 @@ arf_ad_pred <- function(data, job, instance, ...) {
   # Train the ARF model (single-threaded)
   # --------------------------------------
   train_data <- as.data.frame(instance$train_data)
-  testing_data <- as.data.frame(instance$test_data)
+  test_data <- as.data.frame(instance$test_data)
   metab_clin_feats = instance$metab_clin_feats
   metab_feats = instance$metab_feats
   evidence = instance$evidence
   prop_synth <- instance$prop_synth
+  # Set penalty factors for Lasso to avoid shrinking ApoE_bi
+  pf <- rep(1, ncol(x_org_train))
+  names(pf) <- colnames(x_org_train)
+  pf["ApoE_bi"] <- 0   # no shrinkage
   start_time <- Sys.time()
   
   classical_arf <- adversarial_rf(
@@ -297,7 +309,6 @@ arf_ad_pred <- function(data, job, instance, ...) {
     
     # Retrieving testing data and clusters
     synth_classical_data <- as.data.frame(synth_classical_data)
-    test_data <- as.data.frame(testing_data)
     
     # Train RF on original training indices
     rf_org <- ranger(
@@ -316,8 +327,8 @@ arf_ad_pred <- function(data, job, instance, ...) {
       probability = TRUE
     )
     # Predict on test data using both models
-    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
-    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , 2]
+    pred_rf_org <- predict(rf_org, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , "1"]
+    pred_rf_synth <- predict(rf_synth, data = test_data[, -which(colnames(test_data) == "Braak_bin3")])$predictions[ , "1"]
     # Evaluate AUC for RF
     roc_rf_org <- roc(test_data$Braak_bin3, pred_rf_org)
     auc_rf_org <- roc_rf_org$auc
@@ -325,11 +336,12 @@ arf_ad_pred <- function(data, job, instance, ...) {
     auc_rf_synth <- roc_rf_synth$auc
     auc_rf_diff <- auc_rf_org - auc_rf_synth
     # Compute MCC for RF
-    threshold_rf <- coords(roc_rf_synth , "best", ret = "threshold")
-    mcc_rf_org <- mltools::mcc(preds = ifelse(pred_rf_org > threshold_rf$threshold, 1, 0),
-                               actuals = test_data$Braak_bin3)
-    mcc_rf_synth <- mltools::mcc(preds = ifelse(pred_rf_synth > threshold_rf$threshold, 1, 0),
-                                 actuals = test_data$Braak_bin3)
+    trheshold_rf_org <- coords(roc_rf_org, "best", ret = "threshold")$threshold
+    threshold_rf_syn <- coords(roc_rf_synth , "best", ret = "threshold")$threshold
+    mcc_rf_org <- mltools::mcc(preds = ifelse(pred_rf_org > trheshold_rf_org, 1, 0),
+                               actuals = as.integer(as.vector(test_data$Braak_bin3)))
+    mcc_rf_synth <- mltools::mcc(preds = ifelse(pred_rf_synth > threshold_rf_syn, 1, 0),
+                                 actuals = as.integer(as.vector(test_data$Braak_bin3)))
     mcc_rf_diff <- mcc_rf_org - mcc_rf_synth
     
     # Train Lasso on original training indices
@@ -340,7 +352,8 @@ arf_ad_pred <- function(data, job, instance, ...) {
       x_org_train,
       y_org_train,
       alpha = 1,
-      family = "binomial"
+      family = "binomial",
+      penalty.factor = pf
     )
     # Prepare test set
     x_test <- model.matrix(Braak_bin3 ~ . - 1, data = test_data)
@@ -349,6 +362,7 @@ arf_ad_pred <- function(data, job, instance, ...) {
     pred_lasso_org <- predict(lasso_org_model, newx = x_test, s = "lambda.min", type = "response")
     roc_lasso_org <- roc(y_test, as.vector(pred_lasso_org))
     auc_lasso_org <- roc_lasso_org$auc
+    theshold_lasso_org <- coords(roc_lasso_org , "best", ret = "threshold")$threshold
     # Fit lasso on synthetic data
     x_synth_train <- model.matrix(Braak_bin3 ~ . - 1, data = synth_classical_data)
     y_synth_train <- synth_classical_data$Braak_bin3
@@ -356,18 +370,19 @@ arf_ad_pred <- function(data, job, instance, ...) {
       x_synth_train,
       y_synth_train,
       alpha = 1,
-      family = "binomial"
+      family = "binomial",
+      penalty.factor = pf
     )
     # Predict probabilities on test set
     pred_lasso_synth <- predict(lasso_synth_model, newx = x_test, s = "lambda.min", type = "response")
     roc_lasso_synth <- roc(y_test, as.vector(pred_lasso_synth))
     auc_lasso_synth <- roc_lasso_synth$auc
     # Compute MCC for Lasso on synthetic data
-    threshold_lasso_synth <- coords(roc_lasso_synth , "best", ret = "threshold")
-    mcc_lasso_org <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_org) > threshold_lasso_synth$threshold, 1, 0),
-                                  actuals = test_data$Braak_bin3)
-    mcc_lasso_synth <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_synth) > threshold_lasso_synth$threshold, 1, 0),
-                                    actuals = test_data$Braak_bin3)
+    threshold_lasso_synth <- coords(roc_lasso_synth , "best", ret = "threshold")$threshold
+    mcc_lasso_org <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_org) > theshold_lasso_org, 1, 0),
+                                  actuals = as.numeric(as.vector(test_data$Braak_bin3)))
+    mcc_lasso_synth <- mltools::mcc(preds = ifelse(as.vector(pred_lasso_synth) > threshold_lasso_synth, 1, 0),
+                                    actuals = as.numeric(as.vector(test_data$Braak_bin3)))
     mcc_lasso_diff <- mcc_lasso_org - mcc_lasso_synth
     
     # Compute AUC
@@ -387,6 +402,11 @@ arf_ad_pred <- function(data, job, instance, ...) {
       MCC_RF_ORG = mcc_rf_org,
       MCC_RF_SYN = mcc_rf_synth,
       MCC_RF_DIFF = mcc_rf_diff,
+      MCC_Lasso_ORG = mcc_lasso_org,
+      MCC_Lasso_SYN = mcc_lasso_synth,
+      MCC_Lasso_DIFF = mcc_lasso_diff,
+      ApoE_ORG = coef(lasso_org_model, s = "lambda.min")["ApoE_bi", 1],
+      ApoE_SYN = coef(lasso_synth_model, s = "lambda.min")["ApoE_bi", 1],
       time = as.numeric(difftime(iter_end, iter_start, units = "mins")) + training_time_minutes,
       Synthesizer = "ARF"
     )
