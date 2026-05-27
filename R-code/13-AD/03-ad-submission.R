@@ -34,7 +34,7 @@ addAlgorithm(name = "harf_ad_pred", fun = harf_ad_pred, reg = reg)
 addAlgorithm(name = "arf_ad_pred", fun = arf_ad_pred, reg = reg)
 
 # 4. Parameter design
-pdes <- expand.grid(evidence = c(FALSE, TRUE), prop_synth = c(1.1, 1.2, 1.3, 1.4, 1.5))
+pdes <- expand.grid(evidence = c(FALSE, TRUE), prop_synth = c(1, 1.1, 1.2, 1.3, 1.4, 1.5))
 pdes <- list(ad = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
@@ -52,13 +52,13 @@ summarizeExperiments()
 
 # 7. Test h-ARF before submitting to cluster
 id1 = head(findExperiments(prob.name = "ad", algo.name = "harf_ad_pred"), 1)[1, ]
-testJob(id = id1, reg = reg)
+# testJob(id = id1, reg = reg)
 # 8. Test ARF before submitting to cluster
 id2 = head(findExperiments(prob.name = "ad", algo.name = "arf_ad_pred"), 1)[1, ]
-testJob(id = id2, reg = reg)
+# testJob(id = id2, reg = reg)
 
 ids <- findExperiments(reg = reg)
-ids <- ids[, chunk := chunk(job.id, chunk.size = 500)]
+ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
 submitJobs(reg = reg, ids = ids,
            resources = list(walltime = "4:50:00",
                             memory = 1024 * 4,
@@ -104,7 +104,7 @@ res_harf_DT <- rbindlist(lapply(res_harf, function (res) {
 }), idcol = "job.id", fill = TRUE)
 res_harf_DT$algorithm <- "HARF"
 res_harf_DT <- merge(res_harf_DT, job_pars_DT, by = "job.id")
-saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_ad.rds"))
+# saveRDS(res_harf_DT, file.path(ad_results_dir, "harf_ad.rds"))
 
 # Load and flat results for ARF
 ids <- findExperiments(algo.name = "arf_ad_pred", reg = reg)
@@ -123,15 +123,9 @@ res_arf_DT <- rbindlist(lapply(res_arf, function (res) {
 res_arf_DT$algorithm <- "ARF"
 res_arf_DT <- merge(res_arf_DT, job_pars_DT, by = "job.id")
 res_arf_DT$chunck_size <- 0
-saveRDS(res_arf_DT, file.path(res_hember_dt_dir, "arf_ad_pred.rds"))
+# saveRDS(res_arf_DT, file.path(ad_results_dir, "arf_ad_pred.rds"))
 
 # Rbind HARF and ARF results
 # Rename ARI_HARF and ARI_ARF by ARI and NMI_HARF and NMI_ARF by NMI
-res_harf_DT[, `:=`(ARI_SYN = ARI_HARF, NMI_SYN = NMI_HARF)]
-res_arf_DT[, `:=`(ARI_SYN = ARI_ARF, NMI_SYN = NMI_ARF)]
-res_harf_DT$ARI_HARF <- NULL
-res_harf_DT$NMI_HARF <- NULL
-res_arf_DT$ARI_ARF <- NULL
-res_arf_DT$NMI_ARF <- NULL
 res_all_DT <- rbind(res_harf_DT, res_arf_DT, fill = TRUE)
-saveRDS(res_all_DT, file.path(res_hember_dt_dir, "harf_arf_ad_pred.rds"))
+saveRDS(res_all_DT, file.path(ad_results_dir, "harf_arf_ad_pred.rds"))
