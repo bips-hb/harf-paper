@@ -27,8 +27,6 @@ create_ad_data <- function (
   ad_metab <- ad_metab[, ..train_feats]
   ad_metab <- ad_metab[complete.cases(ad_metab)]
   train_indices <- caret::createDataPartition(ad_metab$Braak_bin3, p = 0.7, list = FALSE)[ , "Resample1"]
-  #Log1p transform metabolomics features to reduce skewness
-  ad_metab[, (metab_feats) := lapply(.SD, function(x) log1p(x)), .SDcols = metab_feats]
   # Scale metabolomics features and choose the 10% top variable features based on training data
   ad_metab_train <- ad_metab[train_indices, ]
   ad_metab_train[, (metab_feats) := lapply(.SD, scale), .SDcols = metab_feats]
@@ -38,9 +36,9 @@ create_ad_data <- function (
   train_feats <- c(metab_clin_feats, selected_metab_feats)
   # Scale the selected metabolomics features in the test set using the training set parameters
   ad_metab_test <- ad_metab[-train_indices, ..train_feats]
-  ad_metab_test[, (selected_metab_feats) := lapply(.SD, scale), .SDcols = selected_metab_feats]
+  # ad_metab_test[, (selected_metab_feats) := lapply(.SD, scale), .SDcols = selected_metab_feats]
   
-  return(list(train_data = ad_metab_train[, ..train_feats],
+  return(list(train_data = ad_metab[, ..train_feats],
               test_data = ad_metab_test[, ..train_feats],
               metab_clin_feats = metab_clin_feats, 
               metab_feats = selected_metab_feats,

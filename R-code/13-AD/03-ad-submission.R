@@ -9,7 +9,7 @@ template <- "~/batchtools/batchtools.slurm.tmpl"
 makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
-# unlink(file.path(reg_dir, "ad"), recursive = TRUE)
+unlink(file.path(reg_dir, "ad"), recursive = TRUE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "ad"),
   conf.file = "~/batchtools/batchtools.conf.R",
