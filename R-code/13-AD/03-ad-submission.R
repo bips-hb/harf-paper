@@ -47,7 +47,7 @@ ades <- list(harf_ad_pred = ades, arf_ad_pred = data.frame(num_trees = 10))
 addExperiments(reg = reg,
                prob.designs = pdes,
                algo.designs = ades,
-               repls = 20)
+               repls = 50)
 summarizeExperiments()
 
 # 7. Test h-ARF before submitting to cluster
