@@ -8,16 +8,15 @@ library(ggsci)
 
 ad_results_dir <- "R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/ad"
 ad_res_pred_DT <- readRDS(file.path(ad_results_dir, "harf_arf_ad_pred.rds"))
-ad_res_pred_DT$evidence <- ad_res_pred_DT$evidence.x
 # Keep iteration-level data
 dt <- ad_res_pred_DT[, .(
   chunck_size, CD, UVD.result, MMD_rbk.result,
-  algorithm, evidence, iteration = 1:.N, num_btwn_pcs,
+  algorithm, evidence, iteration = 1:.N, 
   AUC_RF_DIFF, AUC_Lasso_DIFF, MCC_RF_DIFF, MCC_Lasso_DIFF,
   time, prop_synth
 )]
 dt[algorithm == "ARF", chunck_size := 55]
-dt <- dt[chunck_size %in% c(50, 55) & prop_synth == 1, ]
+dt <- dt[chunck_size %in% c(5, 55) & prop_synth == 1, ]
 dt$chunck_size <- as.factor(dt$chunck_size)
 
 my_theme <- theme_minimal(base_size = 14) +
@@ -128,7 +127,7 @@ combined_plot <- ggplot(
   
   labs(
     x = "Prediction Model",
-    y = "Performance Difference (Original - Synthetic)",
+    y = "Empirical value",
     fill = "Synthesizer"
   ) +
   
