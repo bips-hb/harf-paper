@@ -9,7 +9,7 @@ template <- "~/batchtools/batchtools.slurm.tmpl"
 makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
-unlink(file.path(reg_dir, "ad"), recursive = TRUE)
+# unlink(file.path(reg_dir, "ad"), recursive = TRUE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "ad"),
   conf.file = "~/batchtools/batchtools.conf.R",
@@ -39,7 +39,7 @@ pdes <- list(ad = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
   num_trees = 10,
-  chunck_size = seq(50, 50, by = 5),
+  chunck_size = seq(5, 50, by = 5),
   num_btwn_pcs = c(2)
 )
 ades <- list(harf_ad_pred = ades, arf_ad_pred = data.frame(num_trees = 10))

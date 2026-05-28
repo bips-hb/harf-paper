@@ -46,7 +46,7 @@ harf_ad_pred <- function(data, job, instance, ...) {
     n_synth <- if (evidence) 1 else floor(nrow(train_data) * prop_synth)
     evidence_data <- if (evidence) data.frame(Braak_bin3 = sample(
       x = train_data$Braak_bin3,
-      size = n_synth,
+      size = floor(nrow(train_data) * prop_synth),
       replace = TRUE
     )) else NULL
     synth_ad <- h_forge(
@@ -258,7 +258,7 @@ arf_ad_pred <- function(data, job, instance, ...) {
     n_synth <- if (evidence) 1 else floor(nrow(train_data) * prop_synth)
     evidence_data <- if (evidence) data.frame(Braak_bin3 = sample(
       x = train_data$Braak_bin3,
-      size = n_synth,
+      size = floor(nrow(train_data) * prop_synth),
       replace = TRUE
     )) else NULL
     synth_classical_data <- forge(
