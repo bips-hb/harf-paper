@@ -78,33 +78,24 @@ source(file.path(perf_dir, "evaluation_functions.R"))
 org_hember_dt_dir <- file.path(org_data_dir, "hember-lab")
 res_hember_dt_dir <- file.path(res_dir, "hember-lab")
 dir.create(res_hember_dt_dir, recursive = TRUE, showWarnings = FALSE)
-# org_baron_dt_dir <- file.path(org_hember_dt_dir, "brain-baron")
-# org_fan_dt_dir <- file.path(org_hember_dt_dir, "embryo-fan-mouse")
 org_lake_dt_dir <- file.path(org_hember_dt_dir, "brain-lake")
 org_manno_dt_dir <- file.path(org_hember_dt_dir, "brain-manno")
 org_li_dt_dir <- file.path(org_hember_dt_dir, "tissue-li")
 org_patel_dt_dir <- file.path(org_hember_dt_dir, "tissue-patel")
-org_deng_dt_dir <- file.path(org_hember_dt_dir, "embryo-deng-mouse")
 org_simlr_data_dir <- file.path(org_data_dir, "SIMLR")
 org_tcga_tgex_data_dir <- file.path(org_data_dir, "TCGA+GTEX")
 
 # Preprocessed Hember et al. data
-# org_baron_dt_file <- file.path(org_baron_dt_dir, "processed_brain_baron_data.csv")
-# org_fan_dt_file <- file.path(org_fan_dt_dir, "E-MTAB-3321.processed.1.zip")
 org_lake_dt_file <- file.path(org_lake_dt_dir, "processed_brain_lake_data.csv")
 org_manno_dt_file <- file.path(org_manno_dt_dir, "processed_brain_manno_data.csv")
 org_li_dt_file <- file.path(org_li_dt_dir, "processed_tissue_li_data.csv")
 org_patel_dt_file <- file.path(org_patel_dt_dir, "processed_tissue_patel_data.csv")
-org_deng_dt_file <- file.path(org_deng_dt_dir, "embryo_deng_mouse_processed_data.csv")
 
 org_hember_dt_files <- c(
-  # baron = org_baron_dt_file,
-  # fan = org_fan_dt_file,
   lake = org_lake_dt_file,
   manno = org_manno_dt_file,
   li = org_li_dt_file,
-  patel = org_patel_dt_file,
-  deng = org_deng_dt_file
+  patel = org_patel_dt_file
 )
 # Create directories for processed data
 for (folder in dirname(org_hember_dt_files)) {
@@ -155,32 +146,21 @@ dir.create(syn_data_dir, showWarnings = FALSE)
 dir.create(syn_hember_dt_dir, showWarnings = FALSE)
 dir.create(syn_simlr_data_dir, showWarnings = FALSE)
 dir.create(syn_tcga_tgex_data_dir, showWarnings = FALSE)
-# syn_baron_dt_dir <- file.path(syn_hember_dt_dir, "brain-baron")
-# syn_fan_dt_dir <- file.path(syn_hember_dt_dir, "embryo-fan-mouse")
-# syn_deng_dt_dir <- file.path(syn_hember_dt_dir, "embryo-deng-mouse")
 syn_lake_dt_dir <- file.path(syn_hember_dt_dir, "brain-lake")
 syn_manno_dt_dir <- file.path(syn_hember_dt_dir, "brain-manno")
 syn_li_dt_dir <- file.path(syn_hember_dt_dir, "tissue-li")
 syn_patel_dt_dir <- file.path(syn_hember_dt_dir, "tissue-patel")
-# dir.create(syn_baron_dt_dir, showWarnings = FALSE)
-# dir.create(syn_fan_dt_dir, showWarnings = FALSE)
-# dir.create(syn_deng_dt_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(syn_lake_dt_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(syn_manno_dt_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(syn_li_dt_dir, recursive = TRUE, showWarnings = FALSE)
 dir.create(syn_patel_dt_dir, recursive = TRUE, showWarnings = FALSE)
+
 # Prepare file prefixes for synthetic datasets
-# syn_baron_dt_prefix <- file.path(syn_baron_dt_dir, "synth_baron")
-# syn_fan_dt_prefix <- file.path(syn_fan_dt_dir, "synth_fan")
-# syn_deng_dt_prefix <- file.path(syn_deng_dt_dir, "synth_deng")
 syn_lake_dt_prefix <- file.path(syn_lake_dt_dir, "synth_lake")
 syn_manno_dt_prefix <- file.path(syn_manno_dt_dir, "synth_manno")
 syn_li_dt_prefix <- file.path(syn_li_dt_dir, "synth_li")
 syn_patel_dt_prefix <- file.path(syn_patel_dt_dir, "synth_patel")
 syn_hember_dt_prefixes <- c(
-  # baron = syn_baron_dt_prefix,
-  # fan = syn_fan_dt_prefix,
-  # deng = syn_deng_dt_prefix,
   lake = syn_lake_dt_prefix,
   manno = syn_manno_dt_prefix,
   li = syn_li_dt_prefix,
@@ -203,8 +183,6 @@ orig_tcga_data_dir <- file.path(org_tcga_tgex_data_dir, "curatedTCGAData")
 dir.create(orig_tcga_data_dir, showWarnings = FALSE, recursive = TRUE)
 res_tcga_data_dir <- file.path(res_dir, "tcga-tgex")
 dir.create(res_tcga_data_dir, showWarnings = FALSE, recursive = TRUE)
-# orig_brca_data_dir <- file.path(orig_tcga_data_dir, "BRCA")
-# dir.create(orig_brca_data_dir, showWarnings = FALSE)
 orig_luad_data_dir <- file.path(orig_tcga_data_dir, "LUAD")
 dir.create(orig_luad_data_dir, showWarnings = FALSE)
 orig_lusc_data_dir <- file.path(orig_tcga_data_dir, "LUSC")
@@ -213,7 +191,6 @@ orig_kirc_data_dir <- file.path(orig_tcga_data_dir, "KIRC")
 dir.create(orig_kirc_data_dir, showWarnings = FALSE)
 orig_coad_data_dir <- file.path(orig_tcga_data_dir, "COAD")
 dir.create(orig_coad_data_dir, showWarnings = FALSE)
-# orig_brca_data_file <- file.path(orig_brca_data_dir, "brca.txt")
 orig_luad_data_file <- file.path(orig_luad_data_dir, "luad.txt")
 orig_lusc_data_file <- file.path(orig_lusc_data_dir, "lusc.txt")
 orig_kirc_data_file <- file.path(orig_kirc_data_dir, "kirc.txt")
@@ -228,10 +205,9 @@ orig_tcga_data_files <- c(
 )
 
 # Prepare path to synthetic currated TCGA data
+# ============================================
 syn_tcga_data_dir <- file.path(syn_tcga_tgex_data_dir, "curatedTCGAData")
 dir.create(syn_tcga_data_dir, showWarnings = FALSE)
-# syn_brca_data_dir <- file.path(syn_tcga_data_dir, "BRCA")
-# dir.create(syn_brca_data_dir, showWarnings = FALSE)
 syn_luad_data_dir <- file.path(syn_tcga_data_dir, "LUAD")
 dir.create(syn_luad_data_dir, showWarnings = FALSE)
 syn_lusc_data_dir <- file.path(syn_tcga_data_dir, "LUSC")
@@ -240,13 +216,13 @@ syn_kirc_data_dir <- file.path(syn_tcga_data_dir, "KIRC")
 dir.create(syn_kirc_data_dir, showWarnings = FALSE)
 syn_coad_data_dir <- file.path(syn_tcga_data_dir, "COAD")
 dir.create(syn_coad_data_dir, showWarnings = FALSE)
-# syn_brca_dt_prefix <- file.path(syn_brca_data_dir, "synth_brca")
+
+# Prepare file prefixes for synthetic datasets
 syn_luad_dt_prefix <- file.path(syn_luad_data_dir, "synth_luad")
 syn_lusc_dt_prefix <- file.path(syn_lusc_data_dir, "synth_lusc")
 syn_kirc_dt_prefix <- file.path(syn_kirc_data_dir, "synth_kirc")
 syn_coad_dt_prefix <- file.path(syn_coad_data_dir, "synth_coad")
 syn_tcga_dt_prefixes <- c(
-  # brca = syn_brca_dt_prefix,
   luad = syn_luad_dt_prefix,
   lusc = syn_lusc_dt_prefix,
   kirc = syn_kirc_dt_prefix,

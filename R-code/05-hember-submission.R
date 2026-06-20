@@ -9,9 +9,8 @@ template <- "~/batchtools/batchtools.slurm.tmpl"
 makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
-# unlink(file.path(reg_dir, "hember-interchange2"), recursive = TRUE)
 reg <- makeExperimentRegistry(
-  file.dir = file.path(reg_dir, "hember-interchange2"),
+  file.dir = file.path(reg_dir, "hember-synthesizer"),
   conf.file = "~/batchtools/batchtools.conf.R",
   packages = character(0L),
   work.dir = "/home/ckuetef/projects/harf-paper/R-code",
@@ -43,8 +42,8 @@ addProblem(name = "patel",
            reg = reg)
 
 # 3. Add algorithms to registry
-addAlgorithm(name = "harf_synthesizer", fun = harf_interchangeable, reg = reg)
-addAlgorithm(name = "arf_synthesizer", fun = arf_interchangeable, reg = reg)
+addAlgorithm(name = "harf_synthesizer", fun = harf_synthesizer, reg = reg)
+addAlgorithm(name = "arf_synthesizer", fun = arf_synthesizer, reg = reg)
 
 # 4. Parameter design
 pdes <- data.frame(evidence = c(FALSE, TRUE))
@@ -78,13 +77,13 @@ submitJobs(reg = reg, ids = ids,
                             ncpus = 1,
                             partition = "short-cpu",
                             ntasks = 1,
-                            name = "hember_inter"))
+                            name = "hember_synth"))
 waitForJobs(reg = reg)
 
 # ============================
 # Resubmission for failed jobs
 # ============================
-reg <- loadRegistry(file.dir = file.path(reg_dir, "hember-interchange2"),
+reg <- loadRegistry(file.dir = file.path(reg_dir, "hember-synthesizer"),
                     writeable = TRUE,
                     conf.file = "~/batchtools/batchtools.conf.R")
 ids_expired <- findExpired(reg = reg)

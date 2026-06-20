@@ -15,24 +15,6 @@ download_tcga_dt <- function(disease_code, file_nms) {
   X <- X[complete.cases(X), ]
   X <- t(X)
   # Extract the clinical data
-  if (disease_code %in% c("brca")) {
-    clinical_var <- c("patientID",
-                      "years_to_birth",
-                      "Age.at.Initial.Pathologic.Diagnosis",
-                      "gender",
-                      "AJCC.Stage")
-    clinical_data <- se@colData[ , clinical_var]
-    colnames(clinical_data) <- c("patientID",
-                                 "years_to_birth",
-                                 "age_at_diagnosis",
-                                 "gender",
-                                 "tumor_stage")
-    clinical_data <- clinical_data[!clinical_data$tumor_stage %in% c("[Not Available]", "Stage X"), ]
-    stage <- clinical_data$tumor_stage
-    clinical_data <- clinical_data[!clinical_data$tumor_stage %in% c("[Not Available]", "Stage X"), ]
-    stage <- clinical_data$tumor_stage
-    stage_bin <- ifelse(grepl("^Stage (I|II)", stage), "Early", "Late")
-  }
   if (disease_code %in% c("luad", "lusc", "coad")) {
     gender <- "gender"
     if (disease_code %in% c("luad", "lusc")) {

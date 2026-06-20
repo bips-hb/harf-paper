@@ -6,7 +6,8 @@ library(forcats)
 library(cowplot)
 library(ggsci)
 # Local path to the results
-res_tcga_DT <- readRDS("R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/harf_arf_tcga_res.rds")
+res_tcga_DT <- fread(file.path(res_tcga_data_dir, "harf_arf_tcga_res.rds"))
+# res_tcga_DT <- readRDS("R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/harf_arf_tcga_res.rds")
 # Keep iteration-level data
 dt <- res_tcga_DT[, .(
   Data, chunck_size, CD, UVD.result, MMD_rbk.result,
@@ -111,7 +112,7 @@ combined_plot <- ggplot(
   
   labs(
     x = "Prediction Model",
-    y = expression(Delta ~ "ROC-AUC"),
+    y = expression(Delta ~ "AUC"),
     fill = "Synthesizer"
   ) +
   
@@ -149,7 +150,8 @@ combined_plot
 
 # Save the plot
 ggsave(
-  filename = "R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/downstreampred.eps",
+  # filename = "R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/downstreampred.eps",
+   filename = file.path(res_tcga_data_dir, "downstreampred.eps"),
   plot = combined_plot,
   width = 13, height = 12, units = "cm", dpi = 400
 )
@@ -220,7 +222,8 @@ print(perf_plot)
 
 ## Save
 ggsave(
-  filename = "R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/downstreampreddist.eps",
+  # filename = "R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/downstreampreddist.eps",
+  filename = file.path(res_tcga_data_dir, "downstreampreddist.eps"),
   plot = perf_plot,
   width = 13, height = 12, units = "cm", dpi = 400
 )
@@ -228,4 +231,153 @@ ggsave(
 
 # Print the average time 
 print(dt_long_avg[Perf_measure == "Time" & evidence == "No evi.", .(Data, algorithm, mean_perf, sd_perf)])
+
+
+
+
+# ==============================================================================
+# Appendix
+# ==============================================================================
+# Boxplot of AUC and MMD against chunk size variation
+#
+dt_chunk <- res_tcga_DT[, .(
+  Data, chunck_size, CD, UVD.result, MMD_rbk.result,
+  algorithm, evidence, iteration = 1:.N, num_btwn_pcs,
+  AUC_RF_DIFF, AUC_Lasso_DIFF, time
+)]
+dt_chunk[algorithm == "ARF", chunck_size := 55]
+dt_chunk$chunck_size <- as.factor(dt_chunk$chunck_size)
+
+pred_perf_long <- pivot_longer(
+  dt_chunk,
+  cols = c(AUC_RF_DIFF, AUC_Lasso_DIFF, MMD_rbk.result),
+  names_to = "prediction_metric",
+  values_to = "prediction_perf"
+)
+pred_perf_long <- as.data.table(pred_perf_long)
+
+
+# RF AUC plot
+rf_auc_plot <- ggplot(
+  pred_perf_long[
+    num_btwn_pcs %in% c(2, NA) &
+      evidence == FALSE &
+      prediction_metric == "AUC_RF_DIFF"
+  ],
+  aes(x = as.factor(chunck_size), y = prediction_perf, fill = algorithm)
+) +
+  geom_boxplot(outlier.alpha = 1, outlier.size = 1) +
+  # geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  facet_wrap(~ Data, ncol = 2) +
+  theme_classic()+
+  theme_bw() +
+  scale_fill_npg(labels = c("ARF", expression(italic("h")*"-ARF"))) +
+  theme(legend.position = "none", legend.title = element_blank(),
+        axis.text.x = element_text(
+          angle = 45,
+          hjust = 1
+        )) +
+  labs(x = "Chunk size", y = "Empirical AUC") +
+  scale_x_discrete(
+    name = "Chunk size",
+    labels = c("5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "ARF")
+  ) +
+  scale_y_continuous(labels = function(x) sprintf("%.3f", x)) +
+  theme(
+    axis.title.x = element_blank()
+  ) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+print(rf_auc_plot)
+
+
+# Lasso AUC plot
+lasso_auc_plot <- ggplot(
+  pred_perf_long[
+    num_btwn_pcs %in% c(2, NA) &
+      evidence == FALSE &
+      prediction_metric == "AUC_Lasso_DIFF"
+  ],
+  aes(x = as.factor(chunck_size), y = prediction_perf, fill = algorithm)
+) +
+  geom_boxplot(outlier.alpha = 1, outlier.size = 1) +
+  # geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  facet_wrap(~ Data, ncol = 2) +
+  theme_classic()+
+  theme_bw() +
+  scale_fill_npg(labels = c("ARF", expression(italic("h")*"-ARF"))) +
+  theme(legend.position = "bottom", legend.title = element_blank(),
+        axis.text.x = element_text(
+          angle = 45,
+          hjust = 1
+        )) +
+  labs(x = "Chunk size", y = expression(Delta ~ "AUC")) +
+  scale_x_discrete(
+    name = "Chunk size",
+    labels = c("5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "ARF")
+  ) +
+  scale_y_continuous(labels = function(x) sprintf("%.3f", x)) +
+  theme(
+    axis.title.x = element_blank()
+  )
+print(lasso_auc_plot)
+
+
+legend <- get_legend(lasso_auc_plot + theme(legend.position = "bottom"))
+
+pred_auc_plot <- (rf_auc_plot / lasso_auc_plot) + 
+  plot_layout(guides = "collect") + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(legend.position = "bottom",
+        strip.text = element_text(size = 14),
+        plot.caption = element_text(hjust = 0.5, size = 12),
+  )
+print(pred_auc_plot)
+
+# Save the plot
+ggsave(
+  # filename = "R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/downstreampredchunkauc.eps",
+  filename = file.path(res_tcga_data_dir, "downstreampredchunkauc.eps"),
+  plot = pred_auc_plot,
+  width = 13, height = 20, units = "cm", dpi = 400
+)
+
+# MMD plot
+mmd_plot <- ggplot(
+  pred_perf_long[
+    num_btwn_pcs %in% c(2, NA) &
+      evidence == FALSE &
+      prediction_metric == "MMD_rbk.result"
+  ],
+  aes(x = as.factor(chunck_size), y = prediction_perf, fill = algorithm)
+) +
+  geom_boxplot(outlier.alpha = 1, outlier.size = 1) +
+  # geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  facet_wrap(~ Data, ncol = 2) +
+  theme_classic()+
+  theme_bw() +
+  scale_fill_npg(labels = c("ARF", expression(italic("h")*"-ARF"))) +
+  theme(legend.position = "bottom", legend.title = element_blank(),
+        axis.text.x = element_text(
+          angle = 45,
+          hjust = 1
+        )) +
+  labs(x = "Chunk size", y = expression(Delta ~ "MMD")) +
+  scale_x_discrete(
+    name = "Chunk size",
+    labels = c("5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "ARF")
+  ) +
+  scale_y_continuous(labels = function(x) sprintf("%.3f", x)) 
+print(mmd_plot)
+
+# Save the plot
+ggsave(
+  # filename = "R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/downstreampredchunkmmd.eps",
+  filename = file.path(res_tcga_data_dir, "downstreampredchunkmmd.eps"),
+  plot = mmd_plot,
+  width = 13, height = 10, units = "cm", dpi = 400
+)
 

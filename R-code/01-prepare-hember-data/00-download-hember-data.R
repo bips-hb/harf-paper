@@ -2,23 +2,8 @@
 # https://github.com/hemberg-lab/scRNA.seq.datasets/tree/master
 source(file.path(dirname(this.dir()), "00-library-and-setup.R"))
 
-# Download Hemberger/Baron et al. data
-# ====================================
-baron_url <- "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE84133&format=file"
-tar_file <- file.path(org_hember_dt_dir, "brain-baron/data.tar")
-download.file(baron_url, tar_file, mode = "wb")
-untar(tar_file, exdir = org_baron_dt_dir)
-# Grep only human data files
-gz_files <- list.files(org_baron_dt_dir,
-                       pattern = "\\.gz$", full.names = TRUE)
-human_gz_files <- gz_files[grep("human", gz_files)]
-sapply(human_gz_files, gunzip, remove = TRUE, overwrite = TRUE)
-file.remove(tar_file)
-# Clean up: remove non-human files
-non_human_gz_files <- setdiff(gz_files, human_gz_files)
-sapply(non_human_gz_files, file.remove)
-
 # Download Hemberger/Lake et al. cell type labels
+# ===============================================
 # URLs
 lake_url <- "http://genome-tech.ucsd.edu/public/Lake_Science_2016/Lake-2016_Gene_TPM.dat.gz"
 lake_anno_url <- "http://genome-tech.ucsd.edu/public/Lake_Science_2016/Lake-2016_Gene_TPM_Sample-annotation.txt"
