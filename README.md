@@ -1,19 +1,22 @@
-## High-dimensional adversarial random forests
+## High-Dimensional Adversarial Random Forests
 
-This repository contains the code for the paper "High-dimensional adversarial random forests". Before running an `R` script, please make sure to set the working directory to the root of this repository.
-The code is organized as follows:
-- `R-code`: contains all `R` scripts, chronologically numerated.
+This repository contains the code accompanying the paper *"High-Dimensional Adversarial Random Forests"*. Before running any `R` script, set the working directory to the root of this repository.
 
-### Downstream clustering analysis 
-- `01-prepare-hember-data`: contains the code to prepare the Hember data for the analysis.
-- `02-preproceed-hember-data.R`: contains the code to preprocess the Hember data for the analysis.
-- `03-hember-problem.R`, `04-hember-algorithm.R`, `05-hember-submission.R`, `06-hember-results`: contain the batchtools code to conduct the downstream clustering analysis.
-- `07-hember-pairwise-cor.R`: contains the code to conduct the empirical pairwise Pearson correlation between features.
+The code is organized in the `R-code` directory, where scripts are numbered according to the analysis workflow.
 
-### Downstream prediction analysis
-- `08-prepare-currated-tcga-data`: contains the code to download and preprocess the TCGA data for the analysis.
-- `09-tcga-problem.R`, `10-tcga-algorithm.R`, `11-tcga-submission.R`, `12-tcga-results.R`: contain the code to conduct the downstream prediction analysis.
+### Downstream Clustering Analysis
+
+- `01-prepare-hember-data.R`: Prepares the Hember dataset.
+- `02-preprocess-hember-data.R`: Preprocesses the Hember dataset.
+- `03-hember-problem.R`, `04-hember-algorithm.R`, `05-hember-submission.R`, `06-hember-results.R`: Implement and evaluate the downstream clustering experiments using `batchtools`.
+- `07-hember-pairwise-cor.R`: Computes pairwise Pearson correlations between features.
+
+### Downstream Prediction Analysis
+
+- `08-prepare-curated-tcga-data.R`: Downloads and preprocesses the TCGA datasets.
+- `09-tcga-problem.R`, `10-tcga-algorithm.R`, `11-tcga-submission.R`, `12-tcga-results.R`: Implement and evaluate the downstream prediction experiments.
 
 ### Case Study: Alzheimer's Disease Brain Metabolomics
-- `15-AD`: contains the code to prepare and analyze the Alzheimer's disease brain metabolomics data for the analysis.
-- `15-AD/01-ad-problem.R`, `15-AD/02-ad-algorithm.R`, `15-AD/01-ad-submission.R`, `15-AD/03-ad-results.R`: contain the code to conduct the downstream prediction analysis for the Alzheimer's disease brain metabolomics data.
+
+- `15-AD/`: Contains all scripts for data preparation and analysis of the Alzheimer's disease brain metabolomics case study.
+- `15-AD/01-ad-problem.R`, `15-AD/02-ad-algorithm.R`, `15-AD/03-ad-submission.R`, `15-AD/04-ad-results.R`: Implement and evaluate the downstream prediction analysis for the Alzheimer's disease dataset.
