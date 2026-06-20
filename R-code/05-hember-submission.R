@@ -5,12 +5,13 @@ source(file.path(r_code_dir, "03-hember-problem.R"))
 source(file.path(r_code_dir, "04-hember-algorithm.R"))
 
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
-makeClusterFunctionsSlurm(template = "~/batchtools/batchtools.slurm.tmpl")
+template <- "~/batchtools/batchtools.slurm.tmpl"
+makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
-# unlink(file.path(reg_dir, "hember"), recursive = TRUE)
+# unlink(file.path(reg_dir, "hember-interchange2"), recursive = TRUE)
 reg <- makeExperimentRegistry(
-  file.dir = file.path(reg_dir, "hember"),
+  file.dir = file.path(reg_dir, "hember-interchange2"),
   conf.file = "~/batchtools/batchtools.conf.R",
   packages = character(0L),
   work.dir = "/home/ckuetef/projects/harf-paper/R-code",
@@ -42,8 +43,8 @@ addProblem(name = "patel",
            reg = reg)
 
 # 3. Add algorithms to registry
-addAlgorithm(name = "harf_synthesizer", fun = harf_synthesizer, reg = reg)
-addAlgorithm(name = "arf_synthesizer", fun = arf_synthesizer, reg = reg)
+addAlgorithm(name = "harf_synthesizer", fun = harf_interchangeable, reg = reg)
+addAlgorithm(name = "arf_synthesizer", fun = arf_interchangeable, reg = reg)
 
 # 4. Parameter design
 pdes <- data.frame(evidence = c(FALSE, TRUE))
@@ -51,8 +52,8 @@ pdes <- list(lake = pdes, manno = pdes, li = pdes, patel = pdes)
 # 5. Algorithm design
 ades <- expand.grid(
   num_trees = 10,
-  chunck_size = c(25, 50, 75, 100),
-  num_btwn_pcs = c(2, 3)
+  chunck_size = seq(5, 50, by = 5),
+  num_btwn_pcs = c(2)
 )
 ades <- list(harf_synthesizer = ades, arf_synthesizer = data.frame(num_trees = 10))
 # 6. Add experiments to registry
@@ -64,36 +65,37 @@ summarizeExperiments()
 
 # 7. Test before submitting to cluster
 id1 = head(findExperiments(prob.name = "lake", algo.name = "harf_synthesizer"), 175)[1, ]
- # testJob(id = id1, reg = reg)
+# testJob(id = id1, reg = reg)
 
-# id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
+id2 = head(findExperiments(prob.name = "lake", algo.name = "arf_synthesizer"), 1)
 # testJob(id = id2, reg = reg)
 
-ids <- findExperiments()
-ids <- ids[, chunk := chunk(job.id, chunk.size = 400)]
+ids <- findExperiments(reg = reg)
+ids <- ids[, chunk := chunk(job.id, chunk.size = 1000)]
 submitJobs(reg = reg, ids = ids,
-           resources = list(walltime = "10:50:00",
-                            memory = 1024 * 3,
+           resources = list(walltime = "4:50:00",
+                            memory = 1024 * 4,
                             ncpus = 1,
-                            partition = partition,
+                            partition = "short-cpu",
                             ntasks = 1,
-                            name = "harf_hember"))
+                            name = "hember_inter"))
 waitForJobs(reg = reg)
 
 # ============================
 # Resubmission for failed jobs
 # ============================
-reg <- loadRegistry(file.dir = file.path(reg_dir, "hember"),
+reg <- loadRegistry(file.dir = file.path(reg_dir, "hember-interchange2"),
                     writeable = TRUE,
                     conf.file = "~/batchtools/batchtools.conf.R")
 ids_expired <- findExpired(reg = reg)
 ids_error <- findErrors(reg = reg)
-ids_failed <- rbind(ids_expired, ids_error)
+ids_failed <- findNotDone(reg = reg)
 if (length(ids_failed) > 0) {
   message("Resubmitting failed jobs...")
+  ids_failed <- ids_failed[, chunk := chunk(job.id, chunk.size = nrow(ids_failed))]
   submitJobs(reg = reg, ids = ids_failed, 
              resources = list(walltime = "10:59:00",
-                              memory = 1024 * 40,
+                              memory = 1024 * 5,
                               ncpus = 1,
                               partition = partition))
 }
@@ -115,7 +117,7 @@ res_harf_DT <- rbindlist(lapply(res_harf, function (res) {
 }), idcol = "job.id", fill = TRUE)
 res_harf_DT$algorithm <- "HARF"
 res_harf_DT <- merge(res_harf_DT, job_pars_DT, by = "job.id")
-saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_hember_results.rds"))
+saveRDS(res_harf_DT, file.path(res_hember_dt_dir, "harf_hember_res_inter.rds"))
 
 # Load and flat results for ARF
 ids <- findExperiments(algo.name = "arf_synthesizer", reg = reg)
@@ -125,7 +127,7 @@ job_pars_algo <- rbindlist(job_pars$algo.pars, idcol = "job.id", fill = TRUE)
 job_pars_prob <- rbindlist(job_pars$prob.pars, idcol = "job.id", fill = TRUE)
 job_pars_DT <- merge(job_pars_algo, job_pars_prob, by = "job.id")
 res_arf <- reduceResultsList(ids = ids_done, reg = reg)
-res_arf_DT <- rbindlist(res_arf, idcol = "job.id")
+res_arf_DT <- rbindlist(res_arf, idcol = "job.id", fill = TRUE)
 res_arf_DT <- rbindlist(lapply(res_arf, function (res) {
   #Rename columns with prefix  MMD_rbk.MMD* by MMD_rbk*
   setnames(res, gsub("MMD_rbk.MMD", "MMD_rbk", names(res)))
@@ -134,7 +136,7 @@ res_arf_DT <- rbindlist(lapply(res_arf, function (res) {
 res_arf_DT$algorithm <- "ARF"
 res_arf_DT <- merge(res_arf_DT, job_pars_DT, by = "job.id")
 res_arf_DT$chunck_size <- 0
-saveRDS(res_arf_DT, file.path(res_hember_dt_dir, "arf_hember_results.rds"))
+saveRDS(res_arf_DT, file.path(res_hember_dt_dir, "arf_hember_res_inter.rds"))
 
 # Rbind HARF and ARF results
 # Rename ARI_HARF and ARI_ARF by ARI and NMI_HARF and NMI_ARF by NMI
@@ -145,8 +147,4 @@ res_harf_DT$NMI_HARF <- NULL
 res_arf_DT$ARI_ARF <- NULL
 res_arf_DT$NMI_ARF <- NULL
 res_all_DT <- rbind(res_harf_DT, res_arf_DT, fill = TRUE)
-saveRDS(res_all_DT, file.path(res_hember_dt_dir,
-                              "harf_arf_hember_results.rds"))
-
-
-
+saveRDS(res_all_DT, file.path(res_hember_dt_dir, "harf_arf_hember_res_inter.rds"))
