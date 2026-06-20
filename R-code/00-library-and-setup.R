@@ -54,11 +54,6 @@ suppressPackageStartupMessages({
   library(caret)
   library(mltools)
 })
-# registerDoParallel(cores = 2)
-
-# Register cores - Windows
-# cl <- makeCluster(2)
-# registerDoParallel(cl)
 
 # Batchtools configuration
 template <- "~/batchtools/batchtools.slurm.tmpl"
@@ -66,9 +61,8 @@ config_file <- "~/batchtools/batchtools.conf.R"
 if (!file.exists(config_file) || !file.exists(template)) {
   stop("Batchtools configuration files not found.")
 }
-# Setups
+# R code directory
 # =================================
-#r_code_dir <- dirname(this.path())
 r_code_dir <- "/home/ckuetef/projects/harf-paper/R-code"
 
 # Original data directory
