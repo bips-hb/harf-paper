@@ -5,15 +5,14 @@ source(file.path(r_code_dir, "03-hember-problem.R"))
 source(file.path(r_code_dir, "04-hember-algorithm.R"))
 
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
-template <- "~/batchtools/batchtools.slurm.tmpl"
 makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "hember-synthesizer"),
-  conf.file = "~/batchtools/batchtools.conf.R",
+  conf.file = config_file,
   packages = character(0L),
-  work.dir = "/home/ckuetef/projects/harf-paper/R-code",
+  work.dir = r_code_dir,
   source = c(
     file.path(r_code_dir, "00-library-and-setup.R"),
     file.path(perf_dir, "utils.R"),

@@ -5,7 +5,6 @@ source(file.path(r_code_dir, "10-tcga-problem.R"))
 source(file.path(r_code_dir, "11-tcga-algorithm.R"))
 
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
-template <- "~/batchtools/batchtools.slurm.tmpl"
 makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 

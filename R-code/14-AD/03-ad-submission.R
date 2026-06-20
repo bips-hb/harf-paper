@@ -5,16 +5,15 @@ source(file.path(r_code_dir, "14-AD/01-ad-problem.R"))
 source(file.path(r_code_dir, "14-AD/02-ad-algorithm.R"))
 
 # 1.  Prepare registry for Hemberger et al. datasets synthesis with HARF
-template <- "~/batchtools/batchtools.slurm.tmpl"
 makeClusterFunctionsSlurm(template = template)
 partition <- "day-long-cpu"
 
 unlink(file.path(reg_dir, "ad"), recursive = TRUE)
 reg <- makeExperimentRegistry(
   file.dir = file.path(reg_dir, "ad"),
-  conf.file = "~/batchtools/batchtools.conf.R",
+  conf.file = config_file,
   packages = character(0L),
-  work.dir = "/home/ckuetef/projects/harf-paper/R-code/13-AD",
+  work.dir = file.path(r_code_dir, "14-AD"),
   source = c(
     file.path(r_code_dir, "00-library-and-setup.R"),
     file.path(perf_dir, "utils.R"),

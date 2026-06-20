@@ -60,6 +60,12 @@ suppressPackageStartupMessages({
 # cl <- makeCluster(2)
 # registerDoParallel(cl)
 
+# Batchtools configuration
+template <- "~/batchtools/batchtools.slurm.tmpl"
+config_file <- "~/batchtools/batchtools.conf.R"
+if (!file.exists(config_file) || !file.exists(template)) {
+  stop("Batchtools configuration files not found.")
+}
 # Setups
 # =================================
 #r_code_dir <- dirname(this.path())
