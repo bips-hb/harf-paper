@@ -267,7 +267,7 @@ or_plot <- ggplot(
   scale_fill_npg() +
   
   labs(
-    y = "ApoE Odds Ratio (95% CI)",
+    y = expression(ApoE ~ epsilon[4] ~ "Odds Ratio (95% CI)"),
     x = NULL
   ) +
   
