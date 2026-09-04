@@ -6,7 +6,7 @@ library(forcats)
 library(cowplot)
 library(ggsci)
 # Local path to the results
-#res_hember_DT <- readRDS("R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/hember-lab/harf_arf_hember_res_inter.rds")
+# res_hember_DT <- readRDS("R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/hember-lab/harf_arf_hember_res_inter.rds")
 res_hember_DT <- readRDS(file.path(res_hember_dt_dir, "harf_arf_hember_res_inter.rds"))
 # Keep iteration-level data
 dt <- res_hember_DT[, .(
@@ -239,21 +239,54 @@ print(dt_long_avg[Perf_measure == "Time" & evidence == "No evi.", .(Data, algori
 
 # Plot runtime foe each dataset
 runtime_plot <- ggplot(
-  dt_long_avg[num_btwn_pcs %in% c(2, NA) &
-              Perf_measure == "Time" &
-                evidence == "No evi."],
-  aes(x = Data, y = mean_perf, fill = algorithm)
-) +
-  geom_bar(stat = "identity", position = position_dodge()) +
-  geom_errorbar(aes(ymin = mean_perf - sd_perf, ymax = mean_perf), width = 0.2, position = position_dodge(0.9)) +
-  theme_classic() +
-  theme_bw() +
-  scale_fill_npg(labels = c("ARF", expression(italic("h-")*"-ARF"))) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
-  labs(x = "Dataset", y = "Runtime (seconds)") +
-  theme(
-    strip.text = element_text(size = 12),
-    axis.title.x = element_blank(),
-    axis.text.x = element_text(angle = 45, hjust = 1)
+  dt[
+    num_btwn_pcs %in% c(2, NA) &
+      evidence == FALSE
+  ],
+  aes(
+    x = as.factor(chunck_size),
+    y = time,
+    fill = algorithm
   )
+) +
+  geom_boxplot(
+    outlier.alpha = 1,
+    outlier.size = 1
+  ) +
+  facet_wrap(~ Data, ncol = 2) +
+  theme_bw() +
+  scale_fill_npg(
+    labels = c(
+      "ARF",
+      expression(italic("h") * "-ARF")
+    )
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  ) +
+  labs(
+    x = "Chunk size",
+    y = "Runtime (s)"
+  ) +
+  scale_x_discrete(
+    labels = c(
+      "5", "10", "15", "20", "25",
+      "30", "35", "40", "45", "50", "ARF"
+    )
+  ) +
+  scale_y_log10()
+
 print(runtime_plot)
+
+# Save runtime plot
+ggsave(
+  runtime_plot,
+  filename = file.path(res_hember_dt_dir, "downstreamclusteringruntimeplot.eps"),
+  device = "eps",
+  width = 13, height = 10, units = "cm", dpi = 400
+)

@@ -6,7 +6,7 @@ library(forcats)
 library(cowplot)
 library(ggsci)
 # Local path to the results
-res_tcga_DT <- fread(file.path(res_tcga_data_dir, "harf_arf_tcga_res.rds"))
+res_tcga_DT <- readRDS(file.path(res_tcga_data_dir, "harf_arf_tcga_res.rds"))
 # res_tcga_DT <- readRDS("R://ahuels/AIRCO/01_projects/019_adrc_bb_prediction_machine_learning/harf-paper/results/tcga-tgex/harf_arf_tcga_res.rds")
 # Keep iteration-level data
 dt <- res_tcga_DT[, .(
@@ -381,3 +381,59 @@ ggsave(
   width = 13, height = 10, units = "cm", dpi = 400
 )
 
+# Runtime plot
+runtime_plot <- ggplot(
+  dt_chunk[
+    num_btwn_pcs %in% c(2, NA) &
+      evidence == FALSE
+  ],
+  aes(
+    x = as.factor(chunck_size),
+    y = time,
+    fill = algorithm
+  )
+) +
+  geom_boxplot(outlier.alpha = 1, outlier.size = 1) +
+  facet_wrap(~ Data, ncol = 2) +
+  theme_classic() +
+  theme_bw() +
+  scale_fill_npg(
+    labels = c(
+      "ARF",
+      expression(italic("h") * "-ARF")
+    )
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  ) +
+  labs(
+    x = "Chunk size",
+    y = "Runtime (s)"
+  ) +
+  scale_x_discrete(
+    name = "Chunk size",
+    labels = c(
+      "5", "10", "15", "20", "25",
+      "30", "35", "40", "45", "50", "ARF"
+    )
+  ) +
+  scale_y_continuous(
+    labels = function(x) sprintf("%.1f", x)
+  )
+
+print(runtime_plot)
+
+# Save the plot
+ggsave(
+  filename = file.path(res_tcga_data_dir, "downstreampredchunkruntime.eps"),
+  plot = runtime_plot,
+  width = 13,
+  height = 10,
+  units = "cm",
+  dpi = 400
+)
